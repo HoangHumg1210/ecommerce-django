@@ -91,9 +91,9 @@
             <div class="widget-header">
               <small class="title text-muted">Welcome guest!</small>
               <div>
-                <a href="./signin.html">Đăng nhập</a>
+                <a href="{% url 'login'%}">Đăng nhập</a>
                 <span class="dark-transp"> | </span>
-                <a href="./register.html"> Đăng ký</a>
+                <a href="{% url 'register' %}"> Đăng ký</a>
               </div>
             </div>
             <a href="{% url 'cart' %}" class="widget-header pl-3 ml-3">

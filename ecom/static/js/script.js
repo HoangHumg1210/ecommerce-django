@@ -48,3 +48,9 @@ $(document).ready(function () {
   } // end if
 });
 // jquery end
+
+
+setTimeout(function(){
+  $('#meassage').fadeOut('slow')
+
+}, 2000)
