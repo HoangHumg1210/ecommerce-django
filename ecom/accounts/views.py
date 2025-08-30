@@ -1,9 +1,16 @@
 from django.shortcuts import render, redirect
 from .forms import RegistrationForm, Account
 from .models import Account
-from django.contrib import messages
+from django.contrib import messages, auth
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
-
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMessage
 # Create your views here.
 
 def register(request):
@@ -27,8 +34,23 @@ def register(request):
             
             user.phone_number = phone_number
             user.save()
-            messages.success(request, 'Đăng ký thành công.')
-            return redirect('register')
+
+            # User Activation
+            current_site = get_current_site(request)
+            mail_subject = 'Vui lòng kích hoạt tài khoản của bạn'
+            message = render_to_string('accounts/account_verification_email.html', {
+                'user': user,
+                'domain': current_site,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user),
+
+            })
+            to_email = email
+            send_email = EmailMessage(mail_subject, message, to=[to_email])
+            send_email.send()
+            # messages.success(request, 'Cảm ơn bạn đã đăng ký! Chúng tôi đã gửi email xác nhận tới địa chỉ email của bạn. Vui lòng kiểm tra hộp thư và xác nhận tài khoản.')
+            # return redirect('register')
+            return redirect('/accounts/login/?command=verification&email=' + email)
             
         context = {'form': form}
         return render(request, 'accounts/register.html', context)
@@ -39,7 +61,78 @@ def register(request):
 
 
 def login(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+
+
+        user = auth.authenticate(email=email, password=password)
+        
+        if user is not None:
+            auth.login(request, user)
+            messages.success(request, 'Đăng nhập thành công!' )
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Tài khoản hoặc mật khẩu không chính xác")
+            return redirect('login')
     return render(request, 'accounts/login.html')
 
+
+@login_required(login_url = 'login')
 def logout(request):
-    return render(request, 'accounts/logout.html')
+    auth.logout(request)
+    # messages.success("Đăng xuất")
+    return redirect('login')
+
+
+def activate(request, uidb64, token ):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = Account._default_manager.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, Account.DoesNotExist):
+        user = None
+    
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Tài khoản của bạn đã được kích hoạt thành công. Vui lòng đăng nhập để tiếp tục')
+        return redirect('login')
+    else:
+        messages.error(request, 'Liên kết xác thực không hợp lệ')
+        return redirect('register')
+
+
+@login_required(login_url='login')        
+def dashboard(request):
+    return render(request, 'accounts/dashboard.html')
+
+
+def forgotPassword(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        if Account.objects.get(email=email).exits():
+            user = Account.objects.get(email__exact=email)
+            current_site = get_current_site(request)
+            mail_subject = 'Nhập lại mật khẩu'
+            message = render_to_string('accounts/.reset_password_email.html', {
+                'user': user,
+                'domain': current_site,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user),
+
+            })
+            to_email = email
+            send_email = EmailMessage(mail_subject, message, to=[to_email])
+            send_email.send()
+            
+            messages.success(request, 'Email đặt lại mật khẩu đã được gửi tới địa chỉ email của bạn')
+            
+            return render('login')
+        else:
+            messages.error(request, 'Tài khoản không tồn tại')
+            return redirect('forgotPassword')
+    return render(request, 'accounts/forgotPassword.html')
+
+
+def resetpassword_validate(request):
+    return HttpResponse('ok')

@@ -1476,3 +1476,66 @@ select.form-control option {
   font-size: 1rem;
   white-space: nowrap;
 }
+
+.verify-success-card {
+  background: #e3f3fc; /* Xanh dương nhạt */
+  border-radius: 14px;
+  box-shadow: 0 2px 18px 0 rgba(68, 68, 68, 0.1);
+  padding: 36px 30px 24px 30px;
+  text-align: center;
+  font-size: 1.07rem;
+  font-weight: 500;
+  color: #1b385b;
+}
+.verify-success-icon {
+  font-size: 3rem;
+  color: #34a1ff;
+  margin-bottom: 12px;
+}
+.verify-success-title {
+  font-weight: 700;
+  font-size: 1.2em;
+  margin-bottom: 8px;
+  color: #2176bd;
+}
+.verify-success-message {
+  color: #1b385b;
+  margin-bottom: 16px;
+}
+.verify-success-email {
+  font-weight: bold;
+  color: #164685;
+}
+.verify-success-btn {
+  display: block;
+  width: 100%;
+  background: #2994d1;
+  color: #fff;
+  font-weight: 600;
+  padding: 11px 0;
+  border: none;
+  border-radius: 6px;
+  margin: 18px 0 10px 0;
+  transition: background 0.22s;
+  box-shadow: 0 2px 8px 0 rgba(68, 68, 68, 0.07);
+  text-decoration: none;
+}
+.verify-success-btn:hover {
+  background: #2176bd;
+  color: #fff;
+}
+.verify-success-note {
+  font-size: 0.98rem;
+  color: #7187b4;
+  margin-top: 10px;
+}
+.verify-success-note b,
+.verify-success-note a {
+  color: #1976d2;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.verify-success-note a:hover {
+  color: #125199;
+  text-decoration: underline;
+}

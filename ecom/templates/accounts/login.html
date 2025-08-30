@@ -1,1 +1,103 @@
-<h1>login</h1>
+{% extends 'base.html'%} {% block content %}
+<section class="section-conten padding-y" style="min-height: 84vh">
+  {% if request.GET.command == 'verification' %}
+  <div
+    class="container d-flex justify-content-center align-items-center"
+    style="min-height: 84vh"
+  >
+    <div class="w-full" style="max-width: 420px">
+      <div
+        class="shadow rounded-3 text-center py-4 px-4"
+        style="
+          font-size: 1.08rem;
+          background: #e6f5fb;
+          border: 1.5px solid #57bde6;
+          color: #19648c;
+          box-shadow: 0 4px 18px 0 #ccebf5;
+        "
+      >
+        <div style="font-size: 3rem; margin-bottom: 12px; color: #36b4da">
+          <i class="fa fa-check-circle"></i>
+        </div>
+        <strong style="color: #11688a">Cảm ơn bạn đã đăng ký!</strong>
+        <div class="mt-2 mb-2" style="color: #206283">
+          Chúng tôi đã gửi email xác nhận tới địa chỉ
+          <b>{{request.GET.email}}</b>.<br />
+          Vui lòng kiểm tra hộp thư và xác nhận tài khoản để bắt đầu mua sắm.
+        </div>
+        <a
+          href="{% url 'login' %}"
+          class="w-100"
+          style="
+            margin-top: 12px;
+            font-weight: 600;
+            background: #36b4da;
+            color: white;
+            border-radius: 7px;
+            border: none;
+            display: block;
+            padding: 10px 0;
+            text-decoration: none;
+            transition: background 0.2s;
+          "
+          onmouseover="this.style.background='#269ec4'"
+          onmouseout="this.style.background='#36b4da'"
+          >Đăng nhập ngay</a
+        >
+        <div style="font-size: 0.97rem; color: #555; margin-top: 10px">
+          <i class="fa fa-info-circle" style="color: #36b4da"></i>
+          Nếu chưa nhận được email? Kiểm tra mục
+          <b style="color: #19648c">Spam/Quảng cáo</b> hoặc Thử lại
+          <a
+            href="{% url 'register' %}"
+            style="color: #19648c; font-weight: 600; text-decoration: underline"
+          >
+            đăng ký </a
+          >.
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- ... (phần đăng nhập giữ nguyên) ... -->
+  <div class="card mx-auto" style="max-width: 380px; margin-top: 100px">
+    <div class="card-body">
+      <h4 class="card-title mb-4">Đăng nhập</h4>
+      {% include 'includes/alerts.html'%}
+      <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <input
+            type="email"
+            class="form-control"
+            placeholder="Email"
+            name="email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="password"
+            class="form-control"
+            placeholder="Mật khẩu"
+            name="password"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <a href="#" class="float-right">Quên mật khẩu?</a>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary btn-block">
+            Đăng nhập
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <p class="text-center mt-4">
+    Bạn chưa có tài khoản ? <a href="{% url 'register' %}">Đăng ký</a>
+  </p>
+  <br /><br />
+</section>
+{% endif %} {% endblock %}

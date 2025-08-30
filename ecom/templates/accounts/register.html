@@ -8,8 +8,8 @@
 <!-- ============================ COMPONENT REGISTER   ================================= -->
 	<div class="card mx-auto" style="max-width:520px; margin-top:40px;">
       <article class="card-body">
-		{% include 'includes/alerts.html'	%}
-		<header class="mb-4"><h4 class="card-title">Sign up</h4></header>
+		{% include 'includes/alerts.html'%}
+		<header class="mb-4"><h4 class="card-title">Đăng ký</h4></header>
 		<form action="{% url 'register' %}" method="POST">
 			{% csrf_token %}
 
@@ -76,7 +76,7 @@
 			</form>
 		</article><!-- card-body.// -->
     </div> <!-- card .// -->
-    <p class="text-center mt-4">Have an account? <a href="">Log In</a></p>
+    <p class="text-center mt-4">Bạn đã có tài khoản? <a href="{% url 'login' %}">Đăng nhập</a></p>
     <br><br>
 <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
 

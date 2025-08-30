@@ -6,7 +6,7 @@ $(document).ready(function () {
 
   /* ///////////////////////////////////////
 
-    THESE FOLLOWING SCRIPTS ONLY FOR BASIC USAGE, 
+    THESE FOLLOWING SCRIPTS ONLY FOR BASIC USAGE,
     For sliders, interactions and other
 
     */ ///////////////////////////////////////
@@ -48,9 +48,6 @@ $(document).ready(function () {
   } // end if
 });
 // jquery end
-
-
-setTimeout(function(){
-  $('#meassage').fadeOut('slow')
-
-}, 2000)
+setTimeout(function () {
+  $(".custom-alert").alert("close");
+}, 3000);

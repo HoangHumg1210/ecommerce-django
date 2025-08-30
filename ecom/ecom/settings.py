@@ -117,13 +117,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static'
-STATICFILES_DIRS=[
-    'ecom/static',
+# STATIC_URL = 'static/'
+# STATIC_ROOT = BASE_DIR / 'static'
+# STATICFILES_DIRS=[
+#     'ecom/static',
+# ]
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'ecom' / 'static',
 ]
-
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Media files configuration
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -131,7 +135,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: "danger",
-    50: "critical",
+    
 }
+
+# SMTP
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "hungdiem121005@gmail.com"
+EMAIL_HOST_PASSWORD = 'mkjm qiuf gpxl lhzj'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
