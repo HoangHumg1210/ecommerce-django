@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<section class="section-content padding-y bg">
+  <div class="container">
+    <div class="row">
+      <!-- Thông tin giao hàng và đơn hàng -->
+      <aside class="col-lg-8">
+        <!-- Địa chỉ nhận hàng -->
+        <div class="card mb-4 shadow-sm">
+          <h5 class="card-header bg-light text-primary font-weight-bold">
+            Thông tin nhận hàng
+          </h5>
+          <div class="card-body">
+            <div class="mb-2"><strong>{{ order.full_name }}</strong></div>
+            <div class="mb-2">{{ order.full_address }}</div>
+            <div class="mb-2">{{ order.city }}, {{ order.state }}, {{ order.country }}</div>
+            <div class="mb-2">Email: {{ order.email }}</div>
+            <div class="mb-2">SĐT: {{ order.phone }}</div>
+          </div>
+        </div>
+        <!-- Phương thức thanh toán -->
+        <div class="card mb-4 shadow-sm">
+          <h5 class="card-header bg-light text-primary font-weight-bold">
+            Phương thức thanh toán
+          </h5>
+          <div class="card-body">
+            <span class="badge badge-success px-3 py-2">Thanh toán khi nhận hàng (COD)</span>
+            {# Hoặc thay bằng logo PayPal, Visa... nếu có #}
+            {# <img src="{% static 'images/misc/payments.png' %}" height="26"> #}
+          </div>
+        </div>
+        <!-- Sản phẩm trong đơn hàng -->
+        <div class="card mb-4 shadow-sm">
+          <h5 class="card-header bg-light text-primary font-weight-bold">
+            Sản phẩm trong đơn hàng
+          </h5>
+          <div class="card-body px-0">
+            <table class="table align-middle">
+              <thead>
+                <tr class="text-secondary">
+                  <th scope="col">Sản phẩm</th>
+                  <th scope="col" class="text-center">Số lượng</th>
+                  <th scope="col" class="text-right">Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in order_products %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <img src="{{ item.product.image.url }}" alt="{{ item.product.product_name }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; margin-right: 10px;">
+                      <div>
+                        <div class="font-weight-bold">{{ item.product.product_name }}</div>
+                        {% if item.variation.all %}
+                        <div class="text-muted small">
+                          {% for v in item.variation.all %}
+                            {{ v.variation_category|capfirst }}: {{ v.variation_value|capfirst }}{% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">{{ item.quantity }}</td>
+                  <td class="text-right">
+                    <span class="font-weight-bold text-dark">{{ item.product_price|floatformat:"0"|intcomma }}đ</span>
+                    <div class="text-muted small">{{ item.product.price|floatformat:"0"|intcomma }}đ/1 sản phẩm</div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Tổng kết đơn hàng -->
+      <aside class="col-lg-4">
+        <div class="card shadow-sm rounded-3">
+          <div class="card-body">
+            <h5 class="mb-4 text-primary font-weight-bold">Tóm tắt đơn hàng</h5>
+            <dl class="row mb-0">
+              <dt class="col-6">Tạm tính:</dt>
+              <dd class="col-6 text-right">{{ total|floatformat:"0"|intcomma }}đ</dd>
+              <dt class="col-6">Thuế (2%):</dt>
+              <dd class="col-6 text-right">{{ tax|floatformat:"0"|intcomma }}đ</dd>
+              <dt class="col-6 font-weight-bold h5 mt-2">Tổng thanh toán:</dt>
+              <dd class="col-6 text-right font-weight-bold h5 mt-2 text-success">{{ grand_total|floatformat:"0"|intcomma }}đ</dd>
+            </dl>
+            <hr>
+            <p class="text-center mb-3">
+              <img src="{% static 'images/misc/payments.png' %}" height="26" alt="Phương thức thanh toán">
+            </p>
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block py-2 font-weight-bold" style="font-size: 18px;">
+              Thanh toán ngay
+            </a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}

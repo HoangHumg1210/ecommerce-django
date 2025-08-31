@@ -1,5 +1,6 @@
 from django.db import models
 from store.models import Product, Variation
+from accounts.models import Account
 # Create your models here.
 
 
@@ -13,9 +14,10 @@ class Cart(models.Model):#Cart: Đại diện cho một giỏ hàng (thường g
         return self.cart_id
     
 class CartItem(models.Model):    #CartItem: Một sản phẩm nằm trong giỏ.
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE) #product: Tham chiếu đến model Product.
     variations = models.ManyToManyField(Variation, blank=True)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE) #cart: Tham chiếu về Cart chứa sản phẩm đó.
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True) #cart: Tham chiếu về Cart chứa sản phẩm đó.
     quantity = models.IntegerField() #quantity: Số lượng sản phẩm này trong giỏ.
     is_active = models.BooleanField(default=True) #is_active: Cho phép “ẩn” CartItem thay vì xóa cứng.
     

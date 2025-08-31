@@ -1,4 +1,7 @@
-{% extends 'base.html'%} {% load static%} {% block content %}
+{% extends 'base.html'%}
+{% load static%} 
+{% load humanize %}
+{% block content %}
 <section class="section-content padding-y bg">
   <div class="container">
     <!-- ============================ COMPONENT 1 ================================= -->
@@ -69,29 +72,24 @@
                 </td>
                 <td>
                   <div class="price-wrap">
-                    <var class="price">{{ cart_item.sub_total }} VND</var>
-                    <small class="text-muted"
-                      >{{cart_item.product.price}}đ / sản phẩm</small
+                    <var class="price">{{ cart_item.sub_total|intcomma }}đ</var>
+                    <small class="text-muted"></small>
+                      {{cart_item.product.price}}đ&nbsp;/&nbsp;sản&nbsp;phẩm</small
                     >
                   </div>
                   <!-- price-wrap .// -->
-                </td>
                 <td class="text-right">
-                  <!-- <a
-                    href="{% url 'remove_cart_item' cart_item.product.id %}"
-                    class="btn btn-danger"
-                    >Xóa</a
-                  > -->
-                  <!-- <a href="{% url 'remove_cart_item' cart_item.id %}" onclick="return confirm('Bạn có muốn xóa sản phẩm?')" class="btn btn-danger">Xóa</a> -->
-                  {% for cart_item in cart_items %}
-                  {% if cart_items|length == 1 %}
-                      <a href="{% url 'remove_cart_item' cart_item.id %}" onclick="return confirm('Bạn có muốn xóa sản phẩm?')" class="btn btn-danger">Xóa</a>
-                  {% else %}
-                      <a href="{% url 'remove_cart_item' cart_item.id %}" class="btn btn-danger">Xóa</a>
-                  {% endif %}
-              {% endfor %}
-              
+                    {% if cart_items|length == 1 %}
+                      <a href="{% url 'remove_cart_item' cart_item.id %}" 
+                        onclick="return confirm('Bạn có muốn xóa sản phẩm cuối cùng khỏi giỏ hàng?')" 
+                        class="btn btn-danger">Xóa</a>
+                    {% else %}
+                      <a href="{% url 'remove_cart_item' cart_item.id %}" 
+                        class="btn btn-danger">Xóa</a>
+                    {% endif %}
                 </td>
+
+
               </tr>
               {% endfor %}
             </tbody>
@@ -104,19 +102,21 @@
         <div class="card">
           <div class="card-body">
             <dl class="dlist-align">
-              <dt>Tổng giá:</dt>
-              <dd class="text-right">{{total}} VND</dd>
-            </dl>
-            <dl class="dlist-align">
-              <dt>Thuế:</dt>
-              <dd class="text-right">{{ tax }} VND</dd>
-            </dl>
-            <dl class="dlist-align">
-              <dt>Tổng tiền:</dt>
-              <dd class="text-right text-dark b">
-                <strong>{{ grand_total}} VND</strong>
-              </dd>
-            </dl>
+            <dt>Tổng giá:</dt>
+            <dd class="text-right">{{ total|floatformat:"0"|intcomma }}đ</dd>
+          </dl>
+          <dl class="dlist-align">
+            <dt>Thuế:</dt>
+            <dd class="text-right">{{ tax|floatformat:"0"|intcomma }}đ</dd>
+          </dl>
+          <dl class="dlist-align">
+            <dt>Tổng thanh toán:</dt>
+            <dd class="text-right text-dark b">
+              <strong>{{ grand_total|floatformat:"0"|intcomma }}đ</strong>
+            </dd>
+          </dl>
+
+
             <hr />
             <p class="text-center mb-3">
               <img
@@ -124,7 +124,7 @@
                 height="26"
               />
             </p>
-            <a href="./place-order.html" class="btn btn-primary btn-block">
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block">
               Thanh toán
             </a>
 
