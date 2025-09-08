@@ -1,0 +1,102 @@
+<!-- Xin chào {{ user.first_name }} {{user.last_name}}
+Your orders has been recieved 
+order number: {{ order.order_number }}
+
+
+Nếu bạn không phải là người thực hiện đăng ký này, vui lòng bỏ qua email này. -->
+
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận đơn hàng {{ order.order_number }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #f7f7f7; margin: 0; font-family: Arial, Helvetica, sans-serif; }
+        .email-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            padding: 32px 34px 24px 34px;
+        }
+        .email-header {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+        .email-header .shop-name {
+            color: #3258a8;
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .order-title {
+            font-size: 1.22em;
+            color: #262626;
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-align: left;
+        }
+        .greeting { font-size: 1.05em; margin-bottom: 6px; }
+        .order-info {
+            background: #f4f6fa;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 18px 0;
+            font-size: 1em;
+        }
+        .order-info b { color: #3258a8; }
+        .info-text { margin-bottom: 16px; }
+        .btn {
+            display: inline-block;
+            background: #3258a8;
+            color: #fff !important;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 26px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .email-footer {
+            color: #888;
+            font-size: 0.97em;
+            text-align: center;
+            margin-top: 28px;
+        }
+        @media (max-width: 600px) {
+            .email-container { padding: 18px 7vw; }
+            .email-header .shop-name { font-size: 1.25em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <div class="shop-name">{{ shop_name|default:"Shop của bạn" }}</div>
+        </div>
+        <div class="order-title">Xác nhận đơn hàng / Order Confirmation</div>
+        <div class="greeting">Xin chào {{ user.first_name }} {{ user.last_name }},</div>
+        <div class="info-text">
+            Cảm ơn bạn đã đặt hàng tại <b>{{ shop_name|default:"Shop của bạn" }}</b>.<br>
+            Đơn hàng của bạn đã được tiếp nhận và đang được xử lý.
+        </div>
+        <div class="order-info">
+            <p><b>Mã đơn hàng (Order number):</b> {{ order.order_number }}</p>
+            <p><b>Thời gian:</b> {{ order_time |date:" H:i d/m/Y " }}</p>
+            <p><b>Email:</b> {{ user.email }}</p>
+        </div>
+        <div class="info-text">
+            Nếu bạn không phải là người thực hiện đơn hàng này, vui lòng bỏ qua email này.<br>
+            <i>If you did not make this order, please ignore this email.</i>
+        </div>
+        <div class="email-footer">
+            &copy; {{ year|default:2025 }} {{ shop_name|default:"Shop của bạn" }}.
+        </div>
+    </div>
+</body>
+</html> 
+
+

@@ -5,7 +5,7 @@
 {% block content %}
 <section class="section-content padding-y bg">
   <div class="container">
-    <form method="POST">
+    <form method="POST" action="{%url 'place_order' %}">
       {% csrf_token %}
       <div class="row">
         <!-- THÔNG TIN NHẬN HÀNG -->

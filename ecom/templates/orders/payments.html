@@ -5,68 +5,81 @@
 <section class="section-content padding-y bg">
   <div class="container">
     <div class="row">
-      <!-- Thông tin giao hàng và đơn hàng -->
+      <!-- LEFT: Thông tin giao hàng và sản phẩm -->
       <aside class="col-lg-8">
         <!-- Địa chỉ nhận hàng -->
-        <div class="card mb-4 shadow-sm">
-          <h5 class="card-header bg-light text-primary font-weight-bold">
-            Thông tin nhận hàng
-          </h5>
+        <div class="card mb-4 shadow-sm rounded-3 border-0">
+          <div class="card-header bg-white border-bottom-0">
+            <h5 class="mb-0 text-primary font-weight-bold">
+              <i class="fa fa-user-circle mr-2"></i>Thông tin nhận hàng
+            </h5>
+          </div>
           <div class="card-body">
-            <div class="mb-2"><strong>{{ order.full_name }}</strong></div>
-            <div class="mb-2">{{ order.full_address }}</div>
-            <div class="mb-2">{{ order.city }}, {{ order.state }}, {{ order.country }}</div>
-            <div class="mb-2">Email: {{ order.email }}</div>
-            <div class="mb-2">SĐT: {{ order.phone }}</div>
+            <div class="mb-2">
+              <strong>{{ order.first_name }} {{ order.last_name }}</strong>
+            </div>
+            <div class="mb-2">
+              <i class="fa fa-map-marker-alt text-danger mr-1"></i> 
+              {{ order.full_address }}, {{ order.city }}, {{ order.state }}, {{ order.country }}
+            </div>
+            <div class="mb-2"><i class="fa fa-envelope mr-1"></i>Email: {{ order.email }}</div>
+            <div class="mb-2"><i class="fa fa-phone mr-1"></i>SĐT: {{ order.phone }}</div>
+            <div class="mb-2"><i class="fa fa-comment mr-1"></i>Ghi chú: {{ order.order_note }}</div>
           </div>
         </div>
         <!-- Phương thức thanh toán -->
-        <div class="card mb-4 shadow-sm">
-          <h5 class="card-header bg-light text-primary font-weight-bold">
-            Phương thức thanh toán
-          </h5>
+        <div class="card mb-4 shadow-sm rounded-3 border-0">
+          <div class="card-header bg-white border-bottom-0">
+            <h5 class="mb-0 text-primary font-weight-bold">
+              <i class="fa fa-credit-card mr-2"></i>Phương thức thanh toán
+            </h5>
+          </div>
           <div class="card-body">
-            <span class="badge badge-success px-3 py-2">Thanh toán khi nhận hàng (COD)</span>
-            {# Hoặc thay bằng logo PayPal, Visa... nếu có #}
-            {# <img src="{% static 'images/misc/payments.png' %}" height="26"> #}
+            <span class="badge badge-success px-3 py-2" style="font-size: 16px;">
+              <i class="fa fa-money-bill-wave mr-1"></i>Thanh toán khi nhận hàng (COD)
+            </span>
           </div>
         </div>
         <!-- Sản phẩm trong đơn hàng -->
-        <div class="card mb-4 shadow-sm">
-          <h5 class="card-header bg-light text-primary font-weight-bold">
-            Sản phẩm trong đơn hàng
-          </h5>
+        <div class="card mb-4 shadow-sm rounded-3 border-0">
+          <div class="card-header bg-white border-bottom-0">
+            <h5 class="mb-0 text-primary font-weight-bold">
+              <i class="fa fa-box mr-2"></i>Đơn hàng của bạn
+            </h5>
+          </div>
           <div class="card-body px-0">
-            <table class="table align-middle">
+            <table class="table align-middle mb-0">
               <thead>
                 <tr class="text-secondary">
-                  <th scope="col">Sản phẩm</th>
-                  <th scope="col" class="text-center">Số lượng</th>
-                  <th scope="col" class="text-right">Thành tiền</th>
+                  <th scope="col" class="font-weight-bold">Sản phẩm</th>
+                  <th scope="col" class="text-center font-weight-bold">Số lượng</th>
+                  <th scope="col" class="text-right font-weight-bold">Thành tiền</th>
                 </tr>
               </thead>
               <tbody>
-                {% for item in order_products %}
+                {% for cart_item in cart_items %}
                 <tr>
                   <td>
                     <div class="d-flex align-items-center">
-                      <img src="{{ item.product.image.url }}" alt="{{ item.product.product_name }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; margin-right: 10px;">
+                      <img src="{{ cart_item.product.image.url }}" 
+                           alt="{{ cart_item.product.product_name }}" 
+                           class="rounded-lg shadow-sm mr-2" style="width: 56px; height: 56px; object-fit: cover;">
                       <div>
-                        <div class="font-weight-bold">{{ item.product.product_name }}</div>
-                        {% if item.variation.all %}
+                        <div class="font-weight-bold">{{ cart_item.product.product_name }}</div>
+                        {% if cart_item.variations.all %}
                         <div class="text-muted small">
-                          {% for v in item.variation.all %}
-                            {{ v.variation_category|capfirst }}: {{ v.variation_value|capfirst }}{% if not forloop.last %}, {% endif %}
+                          {% for item in cart_item.variations.all %}
+                            {{ item.variation_category|capfirst }}: {{ item.variation_value|capfirst }}{% if not forloop.last %}, {% endif %}
                           {% endfor %}
                         </div>
                         {% endif %}
                       </div>
                     </div>
                   </td>
-                  <td class="text-center">{{ item.quantity }}</td>
+                  <td class="text-center">{{ cart_item.quantity }}</td>
                   <td class="text-right">
-                    <span class="font-weight-bold text-dark">{{ item.product_price|floatformat:"0"|intcomma }}đ</span>
-                    <div class="text-muted small">{{ item.product.price|floatformat:"0"|intcomma }}đ/1 sản phẩm</div>
+                    <span class="font-weight-bold text-dark">{{ cart_item.sub_total|intcomma }}₫</span>
+                    <div class="text-muted small">{{ cart_item.product.price|intcomma }}₫/sản phẩm</div>
                   </td>
                 </tr>
                 {% endfor %}
@@ -75,31 +88,113 @@
           </div>
         </div>
       </aside>
-
-      <!-- Tổng kết đơn hàng -->
+      <!-- RIGHT: Chi tiết thanh toán -->
       <aside class="col-lg-4">
-        <div class="card shadow-sm rounded-3">
+        <div class="card shadow-sm rounded-3 border-0">
           <div class="card-body">
-            <h5 class="mb-4 text-primary font-weight-bold">Tóm tắt đơn hàng</h5>
+            <h5 class="mb-4 text-primary font-weight-bold text-center" style="font-size: 1.5rem; letter-spacing: 1px;">
+              <i class="fa fa-credit-card mr-2"></i>Chi tiết thanh toán
+            </h5>
             <dl class="row mb-0">
               <dt class="col-6">Tạm tính:</dt>
-              <dd class="col-6 text-right">{{ total|floatformat:"0"|intcomma }}đ</dd>
+              <dd class="col-6 text-right">{{ total|floatformat:"0"|intcomma }}₫</dd>
               <dt class="col-6">Thuế (2%):</dt>
-              <dd class="col-6 text-right">{{ tax|floatformat:"0"|intcomma }}đ</dd>
-              <dt class="col-6 font-weight-bold h5 mt-2">Tổng thanh toán:</dt>
-              <dd class="col-6 text-right font-weight-bold h5 mt-2 text-success">{{ grand_total|floatformat:"0"|intcomma }}đ</dd>
+              <dd class="col-6 text-right">{{ tax|floatformat:"0"|intcomma }}₫</dd>
+              <dt class="col-6 font-weight-bold h5 mt-2" style="font-size: 1.18rem;">Tổng thanh toán:</dt>
+              <dd class="col-6 text-right font-weight-bold h5 mt-2 text-success" style="font-size: 1.18rem;">
+                {{ grand_total|floatformat:"0"|intcomma }}₫
+              </dd>
             </dl>
             <hr>
-            <p class="text-center mb-3">
-              <img src="{% static 'images/misc/payments.png' %}" height="26" alt="Phương thức thanh toán">
-            </p>
-            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block py-2 font-weight-bold" style="font-size: 18px;">
-              Thanh toán ngay
-            </a>
+            <div class="text-center mb-3">
+              <img src="{% static 'images/misc/payments.png' %}" height="28" alt="Phương thức thanh toán">
+            </div>
+            <div class="text-center">
+              <a href="{% url 'checkout' %}" 
+                 class="btn btn-outline-secondary btn-block py-2 font-weight-bold mb-2"
+                 style="font-size: 17px; border-radius: 1rem; transition: all 0.15s;">
+                <i class="fa fa-chevron-left mr-1"></i>Quay lại giỏ hàng
+              </a>
+              <div id="paypal-button-container">
+                <!-- PayPal Button -->
+              </div>
+            </div>
           </div>
         </div>
       </aside>
     </div>
   </div>
+  
 </section>
+
+
+<!-- Chèn ở cuối trang, thay YOUR_CLIENT_ID -->
+<div id="paypal-button-container"></div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AQLazLlsV9Dvvk559Ul7BlE4y8uoBa0qVf4BOaKuLCVV7DVVUoyj8i2UuZQot_UuHLfNDvSZ-8yiz-gv&currency=USD"></script>
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var url = "{% url 'payments' %}";
+var csrftoken = getCookie('csrftoken');
+var orderID = "{{ order.order_number }}";
+var payment_method = 'PayPal';
+
+paypal.Buttons({
+    style: {
+        color:  'blue',
+        shape:  'pill',
+        label:  'pay',
+        height: 40
+    },
+    createOrder: function(data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: { value: '{{ grand_total_usd }}' }
+            }]
+        });
+    },
+    onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+            // Gửi dữ liệu về server
+            return fetch(url, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    "X-CSRFToken": csrftoken,
+                },
+                body: JSON.stringify({
+                    orderID: orderID,
+                    transactionID: details.id,
+                    payment_method: payment_method,
+                    status: details.status,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Xử lý kết quả ở đây (redirect, thông báo thành công, v.v.)
+                console.log(data);
+                // Ví dụ: window.location.href = "/orders/complete/";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    }
+}).render('#paypal-button-container');
+</script>
+
 {% endblock %}
