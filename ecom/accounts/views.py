@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
-from .forms import RegistrationForm
-from .models import Account
+from django.shortcuts import get_object_or_404
+from orders.models import Order
+from .forms import RegistrationForm, UserForm, UserProfileForm
+from .models import Account, UserProfile
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -135,34 +137,14 @@ def activate(request, uidb64, token ):
 
 @login_required(login_url='login')        
 def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
+    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
+    orders_count = orders.count()
 
+    context = {
+        'orders_count': orders_count,
+    }
+    return render(request, 'accounts/dashboard.html', context)
 
-# def forgotPassword(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         if Account.objects.get(email=email).exists():
-#             user = Account.objects.get(email__exact=email)
-#             current_site = get_current_site(request)
-#             mail_subject = 'Nhập lại mật khẩu'
-#             message = render_to_string('accounts/.reset_password_email.html', {
-#                 'user': user,
-#                 'domain': current_site,
-#                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-#                 'token': default_token_generator.make_token(user),
-
-#             })
-#             to_email = email
-#             send_email = EmailMessage(mail_subject, message, to=[to_email])
-#             send_email.send()
-            
-#             messages.success(request, 'Email đặt lại mật khẩu đã được gửi tới địa chỉ email của bạn')
-            
-#             return render('login')
-#         else:
-#             messages.error(request, 'Tài khoản không tồn tại')
-#             return redirect('forgotPassword')
-#     return render(request, 'accounts/forgotPassword.html')
 
 def forgotPassword(request):
     if request.method == 'POST':
@@ -222,4 +204,31 @@ def resetPassword(request):
             return redirect('resetPassword')
     else:        
         return render(request, 'accounts/resetPassword.html')
-    
+
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+
+    return render(request, 'accounts/my_orders.html', context)
+
+def edit_profile(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Cập nhật thành công')
+            return redirect('edit_profile')
+        else:
+            user_form = UserForm(instance=request.user)
+            profile_form = UserProfileForm(instance=request.user.profile)
+        context = {
+            'user_form': user_form,
+            'profile_form': profile_form,
+        }
+
+    return render(request, 'accounts/edit_profile.html')

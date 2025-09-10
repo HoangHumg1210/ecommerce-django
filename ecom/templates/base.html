@@ -50,9 +50,19 @@
       media="only screen and (max-width: 1200px)"
     />
 
+    <link
+      href="{% static 'css/custom.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+
     <!-- custom javascript -->
     <!-- PayPal Script -->
     <script src="https://www.paypal.com/sdk/js?client-id=AQLazLlsV9Dvvk559Ul7BlE4y8uoBa0qVf4BOaKuLCVV7DVVUoyj8i2UuZQot_UuHLfNDvSZ-8yiz-gv&currency=USD"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet"
+    />
 
     <script type="text/javascript">
       /// some script
@@ -71,7 +81,14 @@
 
     <!-- footer -->
     {% include 'includes/footer.html' %}
-    <script src="{% static 'js/script.js' %}" type="text/javascript"></script>
-
+    <script src="{% static 'js/script_2.js' %}" type="text/javascript"></script>
+    <script>
+      // Chờ DOM đã sẵn sàng, alert đã render ra thì chạy!
+      $(function() {
+        setTimeout(function(){
+          $('.alert-autohide').fadeOut('slow');
+        }, 4000);
+      });
+    </script>
   </body>
 </html>

@@ -1,0 +1,43 @@
+.rate {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 8px;
+  border: 0;
+  position: relative;
+}
+.rate input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+.rate label {
+  font-size: 22px;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.rate label:hover,
+.rate label:hover ~ label,
+.rate input:checked ~ label {
+  color: #ffc107; /* Vàng khi hover/chọn */
+}
+
+.rating-star .star-empty,
+.stars .star-empty {
+  color: #ddd !important;
+}
+
+
+.rating-star i,
+.stars i,
+.rating-star .fa-star,
+.stars .fa-star,
+.rating-star .fa-star-half-alt,
+.stars .fa-star-half-alt {
+  color: #ffc107 !important;
+}
+
+/* Ngôi sao trống sẽ xám nhạt */
+.rating-star .star-empty,
+.stars .star-empty {
+  color: #ddd !important;
+}

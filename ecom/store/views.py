@@ -1,11 +1,17 @@
-from django.shortcuts import render, get_object_or_404, HttpResponse
-from .models import Product
+from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
+
+from .forms import ReviewForm
+from .models import Product, ReviewRating
 from category.models import Category
 from cart.models import CartItem
 from cart.views import _cart_id
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
-
+from .forms import ReviewForm
+from django.contrib import messages
+from orders.models import OrderProduct
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 
 # Create your views here.
@@ -39,14 +45,23 @@ def product_detail(request, category_slug, product_slug):
     try:
         single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
         in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=single_product).exists()
-        
-    
     except Exception as e:
         raise e
+    if request.user.is_authenticated:
+        try:
+            orderproduct = OrderProduct.objects.filter(user=request.user, product=single_product.id).exists()
+        except OrderProduct.DoesNotExist:
+            orderproduct = None
+    else:
+        orderproduct = None
+
+    reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
     
     context = {
         'single_product': single_product,
         'in_cart'       : in_cart,
+        'orderproduct'  : orderproduct,
+        'reviews'       : reviews,
         
     }
     return render(request, 'store/product_detail.html', context)
@@ -63,3 +78,23 @@ def search(request):
 
     }    
     return render(request,'store/store.html', context)
+
+@require_POST
+@login_required
+def submit_review(request, product_id):
+    url = request.META.get('HTTP_REFERER', '/')
+    form = ReviewForm(request.POST)
+    if form.is_valid():
+        ReviewRating.objects.create(
+            product_id=product_id,
+            user_id=request.user.id,
+            subject=form.cleaned_data['subject'],
+            review=form.cleaned_data['review'],
+            rating=form.cleaned_data['rating'],
+            ip=request.META.get('REMOTE_ADDR', ''),
+            status=True,
+        )
+        messages.success(request, 'Cảm ơn bạn đã gửi đánh giá.')
+    else:
+        messages.error(request, 'Vui lòng nhập đủ thông tin hợp lệ.')
+    return redirect(url)

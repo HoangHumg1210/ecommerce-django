@@ -1,10 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html'%}
+{% block content %}
+<section class="section-content padding-y bg">
+  {% include 'includes/alerts.html'%}
+  <div class="container">
+    <div class="row">
+      {% include 'includes/dashboard_sidebar.html' %}
+      <main class="col-md-9">
+        <article class="card">
+          <header class="card-header">
+            <strong class="d-inline-block mr-3">Lịch sử đơn hàng</strong>
+          </header>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12">
+                {% if orders %}
+                <div class="table-responsive">
+                  <table class="table table-bordered table-sm">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">Mã đơn</th>
+                        <th scope="col">Họ tên</th>
+                        <th scope="col">Số điện thoại</th>
+                        <th scope="col">Tổng tiền</th>
+                        <th scope="col">Thời gian</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for order in orders %}
+                      <tr>
+                        <td>{{ order.order_number }}</td>
+                        <td>{{ order.full_name}}</td>
+                        <td>{{ order.phone }}</td>
+                        <td>{{ order.order_total|floatformat:0 }}₫</td>
+                        <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                {% else %}
+                  <div class="alert alert-info mt-3">Bạn chưa có đơn hàng nào.</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </article>
+      </main>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{#{% extends 'base.html' %}#}
+{##}
+{##}
+{#{% block content %}#}
+{##}
+{#<section class="section-conten padding-y bg">#}
+{##}
+{#{% include 'includes/alerts.html' %}#}
+{#<div class="container">#}
+{#	<div class="row">#}
+{#	{% include 'includes/dashboard_sidebar.html' %}#}
+{#	<main class="col-md-9">#}
+{#		<article class="card">#}
+{#		<header class="card-header">#}
+{#			<strong class="d-inline-block mr-3">Your order history</strong>#}
+{##}
+{#		</header>#}
+{#		<div class="card-body">#}
+{#			<div class="row">#}
+{#			<div class="col-md-12">#}
+{#				<table class="table table-hover">#}
+{#				  <thead>#}
+{#				    <tr>#}
+{#				      <th scope="col">Order #</th>#}
+{#				      <th scope="col">Billing Name</th>#}
+{#				      <th scope="col">Phone</th>#}
+{#				      <th scope="col">Order Total</th>#}
+{#							<th scope="col">Date</th>#}
+{#				    </tr>#}
+{#				  </thead>#}
+{#				  <tbody>#}
+{#						{% for order in orders %}#}
+{#				    <tr>#}
+{#				      <th scope="row"><a href="{% url 'order_detail' order.order_number %}">{{order.order_number}}</a></th>#}
+{#				      <td>{{order.full_name}}</td>#}
+{#				      <td>{{order.phone}}</td>#}
+{#				      <td>${{order.order_total}}</td>#}
+{#							<td>{{order.created_at}}</td>#}
+{#				    </tr>#}
+{#				{% endfor %}#}
+{##}
+{#				  </tbody>#}
+{#				</table>#}
+{#			</div>#}
+{##}
+{#			</div> <!-- row.// -->#}
+{#		</div> <!-- card-body .// -->#}
+{##}
+{#		</article> <!-- order-group.// -->#}
+{#	</main>#}
+{#</div> <!-- row.// -->#}
+{#</div>#}
+{##}
+{##}
+{#</section>#}
+{##}
+{#{% endblock %}#}

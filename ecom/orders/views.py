@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from cart.models import CartItem
 from .forms import OrderForm
@@ -37,7 +37,7 @@ def payments(request):
 
             payment = Payment.objects.create(
                 user=request.user,
-                payment_id=body['transactionID'],  
+                payment_id=body['transactionID'],
                 payment_method=body['payment_method'],
                 amount_paid=order.order_total,
                 status=body['status'],
@@ -64,7 +64,7 @@ def payments(request):
                 orderproduct = OrderProduct.objects.get(id=orderproduct.id)
                 orderproduct.variations.set(product_variation)
                 orderproduct.save()
-            
+
                 product = Product.objects.get(id=item.product_id)
                 product.stock -= item.quantity
                 product.save()
@@ -78,16 +78,22 @@ def payments(request):
                 'order': order,
                 'shop_name': 'Double H Store',
                 'order_time': order_time,
-                'order_products': order_products,    
-                'year': order_time.year,            
+                'order_products': order_products,
+                'year': order_time.year,
             })
             to_email = request.user.email
             send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.content_subtype = "html"
             send_email.send()
-            
-            
-            return JsonResponse({'status': 'success', 'message': 'Payment completed!'})
+
+            data = {
+                'order_number': order.order_number,
+                'payment_id': payment.payment_id,
+            }
+
+
+
+            return JsonResponse(data)
         except Exception as e:
             return JsonResponse({'status': 'fail', 'message': str(e)}, status=500)
     else:
@@ -120,8 +126,6 @@ def place_order(request, total=0, quantity=0):
             data.phone = form.cleaned_data['phone']
             data.email = form.cleaned_data['email']
             data.address_line_1 = form.cleaned_data['address_line_1']
-            data.address_line_2 = form.cleaned_data['address_line_2']
-            data.country = form.cleaned_data['country']
             data.state = form.cleaned_data['state']
             data.city = form.cleaned_data['city']
             data.order_note = form.cleaned_data['order_note']
@@ -136,8 +140,8 @@ def place_order(request, total=0, quantity=0):
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
-            
-            order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number) 
+
+            order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
             context = {
                'order': order,
                'cart_items': cart_items,
@@ -148,66 +152,45 @@ def place_order(request, total=0, quantity=0):
             }
             return render(request, 'orders/payments.html', context)
         else:
-            
-            return render('checkout')   
-        
+
+            return render('checkout')
 
 
 
-def place_order(request, total=0, quantity=0):
-    current_user = request.user
-    cart_items = CartItem.objects.filter(user=current_user)
-    cart_count = cart_items.count()
-    if cart_count <= 0:
-        return redirect('store')
 
-    for cart_item in cart_items:
-        total += cart_item.product.price * cart_item.quantity
-        quantity += cart_item.quantity
 
-    usd_rate = 26389
-    tax = total * 0.02
-    grand_total = total + tax
-    grand_total_usd = round(grand_total / usd_rate, 2)
 
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            data = Order()
-            data.user = current_user
-            data.first_name = form.cleaned_data['first_name']
-            data.last_name = form.cleaned_data['last_name']
-            data.phone = form.cleaned_data['phone']
-            data.email = form.cleaned_data['email']
-            data.address_line_1 = form.cleaned_data['address_line_1']
-            data.address_line_2 = form.cleaned_data['address_line_2']
-            data.country = form.cleaned_data['country']
-            data.state = form.cleaned_data['state']
-            data.city = form.cleaned_data['city']
-            data.order_note = form.cleaned_data['order_note']
-            data.order_total = grand_total
-            data.tax = tax
-            data.ip = request.META.get('REMOTE_ADDR')
-            data.save()
+from django.shortcuts import render, redirect, get_object_or_404
 
-            # Tạo order_number duy nhất
-            today = datetime.date.today()
-            current_date = today.strftime('%Y%m%d')
-            order_number = current_date + str(data.id)
-            data.order_number = order_number
-            data.save()
-            
-            order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number) 
-            context = {
-               'order': order,
-               'cart_items': cart_items,
-               'total': total,
-               'tax': tax,
-               'grand_total': grand_total,
-               'grand_total_usd': grand_total_usd,
-            }
-            return render(request, 'orders/payments.html', context)
-        else:
-            
-            return render('checkout')   
-        
+def order_complete(request):
+    order_number = request.GET.get('order_number')
+    if not order_number:
+        return redirect('home')
+
+
+    order = get_object_or_404(Order, order_number=order_number, is_ordered=True)
+
+
+    ordered_products = OrderProduct.objects.filter(order=order).select_related('product')
+
+
+    subtotal = sum(op.product_price * op.quantity for op in ordered_products)
+
+
+    payment = order.payment
+    if not payment:
+        return redirect('home')
+
+    context = {
+        'order': order,
+        'ordered_products': ordered_products,
+        'order_number': order.order_number,
+        'transID': payment.payment_id,
+        'subtotal': subtotal,
+    }
+    return render(request, 'orders/order_complete.html', context)
+
+
+
+
+

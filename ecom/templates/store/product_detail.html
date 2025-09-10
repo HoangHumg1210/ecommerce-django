@@ -1,127 +1,175 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize%}
-{% block content%}
+{% load humanize %}
+{% block content %}
+
 <section class="section-content padding-y bg">
   <div class="container">
-    <!-- ============================ COMPONENT 1 ================================= -->
     <div class="card">
       <div class="row no-gutters">
         <aside class="col-md-6">
-    <article class="gallery-wrap">
-      <div class="img-big-wrap">
-        <a href="#"><img src="{{single_product.image.url}}" /></a>
-      </div> <!-- img-big-wrap.// -->          
-          
-    </article> <!-- gallery-wrap .end// -->      
-        </aside>
-        <main class="col-md-6 border-left">
-         
-          <form action="{% url 'add_cart' single_product.id %}" method="POST">
-          {% csrf_token %}
-          <article class="content-body">
-
-            <h2 class="title">{{ single_product.product_name }}</h2>
-
-            <div class="mb-3">
-              <var class="price h4">{{ single_product.price|intcomma}}đ</var>
+          <article class="gallery-wrap">
+            <div class="img-big-wrap">
+              <a href="#"><img src="{{ single_product.image.url }}" /></a>
             </div>
+          </article>
+        </aside>
 
-            <p>{{ single_product.description }}</p>
+        <main class="col-md-6 border-left">
+          <form action="{% url 'add_cart' single_product.id %}" method="POST">
+            {% csrf_token %}
+            <article class="content-body">
+              <h2 class="title">{{ single_product.product_name }}</h2>
 
-            <hr />
-            <div class="row">
-              <div class="item-option-select">
-                <h6>Màu sắc</h6>
-                <select name="color" class="form-control" required>
-                  <!-- <option value="" disabled selected>Chọn màu</option> -->
-                  {% for i in single_product.variation_set.colors %}
-                  <option value="{{ i.variation_value |lower }}">{{ i.variation_value | capfirst }}</option>
-                  {% endfor %}
-                </select>
+              <!-- ⭐ Sao trung bình -->
+              <div class="rating-star">
+                <span class="stars stars-lg" aria-label="Average {{ single_product.averageReview|floatformat:1 }} / 5">
+                  {% with avg=single_product.averageReview %}
+                    <i class="{% if avg >= 1 %}fas fa-star{% elif avg >= 0.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                    <i class="{% if avg >= 2 %}fas fa-star{% elif avg >= 1.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                    <i class="{% if avg >= 3 %}fas fa-star{% elif avg >= 2.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                    <i class="{% if avg >= 4 %}fas fa-star{% elif avg >= 3.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                    <i class="{% if avg >= 5 %}fas fa-star{% elif avg >= 4.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                  {% endwith %}
+                  <span class="ml-1 text-muted">({{ single_product.countReview }} reviews)</span>
+                </span>
               </div>
-            </div> 
-            <div class="row">
-              <div class="item-option-select">
-                <h6>Kích cỡ</h6>
+
+              <div class="mb-3">
+                <var class="price h4">{{ single_product.price|intcomma }}đ</var>
+              </div>
+
+              <p>{{ single_product.description }}</p>
+
+              <hr />
+              <!-- Variations -->
+              <div class="row">
+                <div class="item-option-select">
+                  <h6>Màu sắc</h6>
+                  <select name="color" class="form-control" required>
+                    {% for i in single_product.variation_set.colors %}
+                      <option value="{{ i.variation_value|lower }}">{{ i.variation_value|capfirst }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="item-option-select">
+                  <h6>Kích cỡ</h6>
                   <select name="size" class="form-control">
                     {% for i in single_product.variation_set.sizes %}
-                    <option value="{{ i.variation_value | lower}}">{{ i.variation_value | capfirst }}</option>
+                      <option value="{{ i.variation_value|lower }}">{{ i.variation_value|capfirst }}</option>
                     {% endfor %}
-                    <!-- <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL">XL</option>
-                    <option value="2XL">2XL</option> -->
-
-                    
-                  </select> 
+                  </select>
+                </div>
               </div>
-            </div>
-          <hr />
-          <!-- {% if single_product.stock <= 0 %}
-            <h5 class="text-danger">Tạm hết</h5>
-            {% else %}
-          {% if in_cart %}              
-            
-            <button type="submit" class="btn btn-primary"  ><span class="text">Thêm vào giỏ hàng</span><i class="fas fa-shopping-cart"></i></button>
-            {% endif %}
-          {% endif %} -->
 
-          {% if single_product.stock <= 0 %}
-            <h5 class="text-danger">Tạm hết</h5>
-          {% else %}
-            <button type="submit" class="btn btn-primary"> <span class="text">Thêm vào giỏ hàng</span><i class="fas fa-shopping-cart"></i></button>
-            <a href="{% url 'cart' %}" class="btn btn-outline-primary"><span class="text">Xem giỏ hàng</span><i class="fas fa-eye"></i></a>
-    
-          {% endif %}
-
-          </article> <!-- product-info-aside .// -->
-         
-        </form>
+              <hr />
+              {% if single_product.stock <= 0 %}
+                <h5 class="text-danger">Tạm hết</h5>
+              {% else %}
+                <button type="submit" class="btn btn-primary">
+                  <span class="text">Thêm vào giỏ hàng</span><i class="fas fa-shopping-cart"></i>
+                </button>
+                <a href="{% url 'cart' %}" class="btn btn-outline-primary">
+                  <span class="text">Xem giỏ hàng</span><i class="fas fa-eye"></i>
+                </a>
+              {% endif %}
+            </article>
+          </form>
         </main>
-        <!-- col.// -->
       </div>
-      <!-- row.// -->
     </div>
-    <!-- card.// -->
-    <!-- ============================ COMPONENT 1 END .// ================================= -->
 
-    <br />
+    <br>
 
     <div class="row">
       <div class="col-md-9">
+
+        <!-- ⭐ Form viết review -->
+        <form action="{% url 'submit_review' single_product.id %}" method="POST">
+          {% csrf_token %}
+          <h5>Đánh giá sản phẩm</h5>
+          <div>
+            <label>Bạn đánh giá sản phẩm này như thế nào?</label><br>
+                <div class="rate">
+  <input type="radio" name="rating" id="r5" value="5" required />
+  <label for="r5" title="5"><i class="fa fa-star"></i></label>
+  <input type="radio" name="rating" id="r4" value="4" />
+  <label for="r4" title="4"><i class="fa fa-star"></i></label>
+  <input type="radio" name="rating" id="r3" value="3" />
+  <label for="r3" title="3"><i class="fa fa-star"></i></label>
+  <input type="radio" name="rating" id="r2" value="2" />
+  <label for="r2" title="2"><i class="fa fa-star"></i></label>
+  <input type="radio" name="rating" id="r1" value="1" />
+  <label for="r1" title="1"><i class="fa fa-star"></i></label>
+</div>
+
+
+
+
+            <br>
+            <div class="form-group">
+              <label>Tiêu đề đánh giá:</label>
+              <input type="text" class="form-control" name="subject" placeholder="Nhập tiêu đề đánh giá">
+            </div>
+            <br>
+            <div class="form-group">
+              <label>Nội dung đánh giá:</label>
+              <textarea name="review" rows="4" class="form-control" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm"></textarea>
+            </div>
+            <br>
+            {% if user.is_authenticated %}
+              {% if orderproduct %}
+                <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Gửi đánh giá</button>
+              {% else %}
+                <div class="alert alert-warning">Bạn cần mua sản phẩm này để có thể đánh giá.</div>
+              {% endif %}
+            {% else %}
+              <div class="alert alert-info">
+                Vui lòng <a href="{% url 'login' %}" class="alert-link">đăng nhập</a> để đánh giá sản phẩm.
+              </div>
+            {% endif %}
+          </div>
+          {% include 'includes/alerts.html' %}
+        </form>
+
+        <br>
         <header class="section-heading">
-          <h3>Đánh giá</h3>
+          <h3>Đánh giá từ khách hàng</h3>
         </header>
 
-        <article class="box mb-3">
-          <div class="icontext w-100">
-            <img
-              src="{% static './images/avatars/avatar1.jpg' %}"
-              class="img-xs icon rounded-circle"
-            />
-            <div class="text">
-              <span class="date text-muted float-md-right">24.04.2020 </span>
-              <h6 class="mb-1">Mike John</h6>
+        {% for review in reviews %}
+          <article class="box mb-3">
+            <div class="icontext w-100">
+              <div class="text">
+                <span class="date text-muted float-md-right">{{ review.updated_at|date:"d/m/Y H:i" }} </span>
+                <h6 class="mb-1">{{ review.user.full_name }}</h6>
+                <div class="rating-star">
+                  <span class="stars stars-sm">
+                    {% with s=review.rating %}
+                      <i class="{% if s >= 1 %}fas fa-star{% elif s >= 0.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if s >= 2 %}fas fa-star{% elif s >= 1.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if s >= 3 %}fas fa-star{% elif s >= 2.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if s >= 4 %}fas fa-star{% elif s >= 3.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if s >= 5 %}fas fa-star{% elif s >= 4.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                    {% endwith %}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-          <!-- icontext.// -->
-          <div class="mt-3">
-            <p>
-              Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing
-              elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-              aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-              laboris nisi ut aliquip
-            </p>
-          </div>
-        </article>
-      </div>
-      <!-- col.// -->
-    </div>
-    <!-- row.// -->
-  </div>
-  <!-- container .//  -->
-</section>
-<!-- ========================= SECTION CONTENT END// ========================= -->
+            <div class="mt-3">
+              <h6 class="text-primary">{{ review.subject }}</h6>
+              <p class="text-muted">{{ review.review }}</p>
+            </div>
+          </article>
+        {% empty %}
+          <div class="alert alert-info">Chưa có đánh giá nào cho sản phẩm này.</div>
+        {% endfor %}
 
-{% endblock content %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
