@@ -2,6 +2,7 @@
 {% load static %}
 {% load humanize %}
 {% load l10n %}
+
 {% block content %}
 <section class="section-content padding-y bg">
   <div class="container">
@@ -16,13 +17,8 @@
             </h5>
           </div>
           <div class="card-body">
-            <div class="mb-2">
-              <strong>{{ order.first_name }} {{ order.last_name }}</strong>
-            </div>
-            <div class="mb-2">
-              <i class="fa fa-map-marker-alt text-danger mr-1"></i>
-              {{ order.full_address }}, {{ order.city }}, {{ order.state }}, {{ order.country }}
-            </div>
+            <div class="mb-2"><strong>{{ order.first_name }} {{ order.last_name }}</strong></div>
+            <div class="mb-2"><i class="fa fa-map-marker-alt text-danger mr-1"></i>{{ order.full_address }}, {{ order.city }}, {{ order.state }}, {{ order.country }}</div>
             <div class="mb-2"><i class="fa fa-envelope mr-1"></i>Email: {{ order.email }}</div>
             <div class="mb-2"><i class="fa fa-phone mr-1"></i>SĐT: {{ order.phone }}</div>
             <div class="mb-2"><i class="fa fa-comment mr-1"></i>Ghi chú: {{ order.order_note }}</div>
@@ -37,9 +33,18 @@
             </h5>
           </div>
           <div class="card-body">
-            <span class="badge badge-success px-3 py-2" style="font-size: 16px;">
-              <i class="fa fa-money-bill-wave mr-1"></i>Thanh toán khi nhận hàng (COD)
-            </span>
+            <div class="custom-control custom-radio mb-2">
+              <input type="radio" id="pm-cod" name="pm" class="custom-control-input" value="COD" checked>
+              <label class="custom-control-label" for="pm-cod">
+                <span class="badge badge-success px-3 py-2"><i class="fa fa-money-bill-wave mr-1"></i>Thanh toán khi nhận hàng (COD)</span>
+              </label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="pm-paypal" name="pm" class="custom-control-input" value="PAYPAL">
+              <label class="custom-control-label" for="pm-paypal">
+                <span class="badge badge-primary px-3 py-2"><i class="fab fa-paypal mr-1"></i>Thanh toán bằng PayPal</span>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -64,9 +69,7 @@
                 <tr>
                   <td>
                     <div class="d-flex align-items-center">
-                      <img src="{{ cart_item.product.image.url }}"
-                           alt="{{ cart_item.product.product_name }}"
-                           class="rounded-lg shadow-sm mr-2" style="width: 56px; height: 56px; object-fit: cover;">
+                      <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.product_name }}" class="rounded-lg shadow-sm mr-2" style="width:56px;height:56px;object-fit:cover">
                       <div>
                         <div class="font-weight-bold">{{ cart_item.product.product_name }}</div>
                         {% if cart_item.variations.all %}
@@ -85,6 +88,10 @@
                     <div class="text-muted small">{{ cart_item.product.price|intcomma }}₫/sản phẩm</div>
                   </td>
                 </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted">Giỏ hàng trống</td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -96,7 +103,7 @@
       <aside class="col-lg-4">
         <div class="card shadow-sm rounded-3 border-0">
           <div class="card-body">
-            <h5 class="mb-4 text-primary font-weight-bold text-center" style="font-size: 1.5rem; letter-spacing: 1px;">
+            <h5 class="mb-4 text-primary font-weight-bold text-center" style="font-size:1.5rem;letter-spacing:1px">
               <i class="fa fa-credit-card mr-2"></i>Chi tiết thanh toán
             </h5>
             <dl class="row mb-0">
@@ -104,8 +111,8 @@
               <dd class="col-6 text-right">{{ total|floatformat:"0"|intcomma }}₫</dd>
               <dt class="col-6">Thuế (2%):</dt>
               <dd class="col-6 text-right">{{ tax|floatformat:"0"|intcomma }}₫</dd>
-              <dt class="col-6 font-weight-bold h5 mt-2" style="font-size: 1.18rem;">Tổng thanh toán:</dt>
-              <dd class="col-6 text-right font-weight-bold h5 mt-2 text-success" style="font-size: 1.18rem;">
+              <dt class="col-6 font-weight-bold h5 mt-2" style="font-size:1.18rem">Tổng thanh toán:</dt>
+              <dd class="col-6 text-right font-weight-bold h5 mt-2 text-success" style="font-size:1.18rem">
                 {{ grand_total|floatformat:"0"|intcomma }}₫
               </dd>
             </dl>
@@ -114,12 +121,18 @@
               <img src="{% static 'images/misc/payments.png' %}" height="28" alt="Phương thức thanh toán">
             </div>
 
-            <!-- PayPal Button -->
-            <div id="paypal-button-container"></div>
+            <!-- PayPal section (ẩn/hiện theo lựa chọn) -->
+            <div id="paypal-section" style="display:none">
+              <div id="paypal-button-container"></div>
+            </div>
 
             <!-- số tiền USD cho PayPal (không localize) -->
-            <input type="hidden" id="paypal_amount"
-              value="{% localize off %}{{ grand_total_usd|floatformat:2 }}{% endlocalize %}">
+            <input type="hidden" id="paypal_amount" value="{% localize off %}{{ grand_total_usd|floatformat:2 }}{% endlocalize %}">
+
+            <!-- COD button (chỉ hiện khi chọn COD) -->
+            <button id="cod-btn" class="btn btn-success btn-block mt-3">
+              <i class="fa fa-box-open mr-1"></i> Đặt hàng
+            </button>
           </div>
         </div>
       </aside>
@@ -127,77 +140,127 @@
   </div>
 </section>
 
-<!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=AQLazLlsV9Dvvk559Ul7BlE4y8uoBa0qVf4BOaKuLCVV7DVVUoyj8i2UuZQot_UuHLfNDvSZ-8yiz-gv&currency=USD"></script>
+<!-- PayPal SDK: tắt funding card/credit/paylater, ngôn ngữ vi_VN -->
+<script src="https://www.paypal.com/sdk/js?client-id=AQLazLlsV9Dvvk559Ul…f4BOaKuLCVV7DVVUoyj8i2UuZQot_UuHLfNDvSZ-8yiz-gv&currency=USD"></script>
 
 <script>
-// CSRF helper
+// ========== Helpers ==========
 function getCookie(name) {
   var cookieValue = null;
   if (document.cookie && document.cookie !== '') {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-          var cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-          }
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
       }
+    }
   }
   return cookieValue;
 }
 
-var url = "{% url 'payments' %}";
-var csrftoken = getCookie('csrftoken');
-var orderID = "{{ order.order_number }}";
-var payment_method = 'PayPal';
-var redirect_url = "{% url 'order_complete' %}";
+function getPaypalAmount() {
+  const raw = document.getElementById('paypal_amount')?.value || '0';
+  const cleaned = raw.toString().replace(/[^0-9.]/g, '');
+  const val = parseFloat(cleaned);
+  return isNaN(val) ? '0.00' : val.toFixed(2);
+}
 
+// ========== Consts ==========
+const url = "{% url 'payments' %}";
+const csrftoken = getCookie('csrftoken');
+const localOrderNumber = "{{ order.order_number }}";
+const redirect_url = "{% url 'order_complete' %}";
+
+// ========== Toggle PM ==========
+const codRadio = document.getElementById('pm-cod');
+const ppRadio  = document.getElementById('pm-paypal');
+const ppBox    = document.getElementById('paypal-section');
+const codBtn   = document.getElementById('cod-btn');
+
+function togglePM() {
+  const usePP = ppRadio.checked;
+  ppBox.style.display = usePP ? 'block' : 'none';
+  codBtn.style.display = usePP ? 'none' : 'block';
+}
+codRadio.addEventListener('change', togglePM);
+ppRadio.addEventListener('change', togglePM);
+togglePM(); // init
+
+// ========== COD flow ==========
+codBtn.addEventListener('click', function(){
+  codBtn.disabled = true;
+  codBtn.innerText = 'Đang xử lý...';
+  const payload = {
+    orderID: localOrderNumber,             // dùng mã đơn nội bộ
+    transactionID: '',                     // COD không có mã giao dịch từ cổng
+    payment_method: 'COD',
+    status: 'COD',
+    amount: '', currency: 'VND',
+    local_order_number: localOrderNumber
+  };
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, 'Accept':'application/json' },
+    body: JSON.stringify(payload),
+  })
+  .then(r => r.json())
+  .then(data => {
+    const orderNo = data?.order_number || localOrderNumber;
+    const paymentId = data?.payment_id || '';
+    window.location.href = `${redirect_url}?order_number=${orderNo}&payment_id=${paymentId}`;
+  })
+  .catch(err => {
+    console.error('COD error:', err);
+    alert('Có lỗi khi xác nhận COD. Vui lòng thử lại.');
+    codBtn.disabled = false;
+    codBtn.innerText = 'Xác nhận đơn (COD)';
+  });
+});
+
+// ========== PayPal Buttons ==========
 paypal.Buttons({
-  style: {
-    color:  'blue',
-    shape:  'pill',
-    label:  'pay',
-    height: 40
-  },
+  style: { color:'blue', shape:'pill', label:'pay', height:40 },
   createOrder: function(data, actions) {
-
-    let raw = document.getElementById('paypal_amount').value;
-    let value = (Number(String(raw).replace(',', '.'))).toFixed(2);
-
+    const value = getPaypalAmount();
     return actions.order.create({
-      purchase_units: [{
-        amount: {
-          currency_code: 'USD',
-          value: value
-        }
-      }]
+      purchase_units: [{ amount: { currency_code:'USD', value:value } }]
     });
   },
   onApprove: function(data, actions) {
-    return actions.order.capture().then(function(details) {
+    return actions.order.capture().then(function(orderData) {
+      const pu = orderData?.purchase_units?.[0];
+      const capture = pu?.payments?.captures?.[0];
+      const payload = {
+        orderID: orderData.id,                          // PayPal Order ID
+        transactionID: capture?.id || '',               // Capture ID
+        payment_method: 'PayPal',
+        status: capture?.status || orderData?.status || '',
+        amount: capture?.amount?.value || '',
+        currency: capture?.amount?.currency_code || 'USD',
+        local_order_number: localOrderNumber
+      };
       return fetch(url, {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          "X-CSRFToken": csrftoken,
-        },
-        body: JSON.stringify({
-          orderID: orderID,
-          transactionID: details.id,
-          payment_method: payment_method,
-          status: details.status,
-        })
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'X-CSRFToken': csrftoken, 'Accept':'application/json' },
+        body: JSON.stringify(payload),
       })
-      .then((response) => response.json())
+      .then(r => r.json())
       .then(data => {
-        // BE phải trả 'payment_id' để đoạn này không bị undefined
-        window.location.href = redirect_url + '?order_number=' + data.order_number + '&payment_id=' + data.payment_id;
+        const orderNo = data?.order_number || localOrderNumber;
+        const paymentId = data?.payment_id || payload.transactionID;
+        window.location.href = `${redirect_url}?order_number=${orderNo}&payment_id=${paymentId}`;
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch(err => {
+        console.error('PayPal error:', err);
+        alert('Thanh toán thành công nhưng ghi nhận đơn hàng lỗi. Vui lòng liên hệ CSKH.');
       });
     });
+  },
+  onError: function(err){
+    console.error('PayPal init error:', err);
+    alert('Có lỗi khi khởi tạo PayPal. Vui lòng chọn phương thức khác hoặc thử lại.');
   }
 }).render('#paypal-button-container');
 </script>

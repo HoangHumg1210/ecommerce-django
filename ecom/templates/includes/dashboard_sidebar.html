@@ -1,14 +1,45 @@
-<aside class="col-md-3">
-		<!--   SIDEBAR   -->
-		<ul class="list-group">
-			<a class="list-group-item {% if '/accounts/' == request.path %} active{% endif %}" href="{% url 'dashboard' %}"> Dashboard </a>
-			<a class="list-group-item {% if '/my_orders/' in request.path %} active{% endif %}" href="{% url 'my_orders' %}"> My Orders </a>
-			<a class="list-group-item {% if '/edit_profile/' in request.path %} active{% endif %}" href="{% url 'edit_profile' %}"> My Orders </a>
-			<a class="list-group-item" href="#">Change Password </a>
+{#<aside class="col-md-3">#}
+{#		<!--   SIDEBAR   -->#}
+{#		<ul class="list-group">#}
+{#			<a class="list-group-item {% if '/accounts/' == request.path %} active{% endif %}" href="{% url 'dashboard' %}"> Dashboard </a>#}
+{#			<a class="list-group-item {% if '/my_orders/' in request.path %} active{% endif %}" href="{% url 'my_orders' %}"> My Orders </a>#}
+{#			<a class="list-group-item {% if '/edit_profile/' in request.path %} active{% endif %}" href="{% url 'edit_profile' %}"> My Orders </a>#}
+{#			<a class="list-group-item {% if '/change_password/' in request.path %} active{% endif %}" href="{% url 'change_password' %}">Change Password </a>#}
 {#			<a class="list-group-item" href="#"> My Selling Items </a>#}
 {#			<a class="list-group-item" href="#"> Received orders </a>#}
-		</ul>
-		<br>
-		<a class="btn btn-light btn-block" href="{% url 'logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Đăng xuất</span> </a>
-		<!--   SIDEBAR .//END   -->
-	</aside>
+{#		</ul>#}
+{#		<br>#}
+{#		<a class="btn btn-light btn-block" href="{% url 'logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Đăng xuất</span> </a>#}
+{#	</aside>#}
+
+
+<aside class="col-md-3">
+  <!--   SIDEBAR   -->
+  <ul class="list-group shadow-sm rounded-3">
+    <a class="list-group-item list-group-item-action {% if '/accounts/' == request.path %} active{% endif %}"
+       href="{% url 'dashboard' %}">
+       <i class="fa fa-home mr-2 text-primary"></i> Bảng điều khiển
+    </a>
+
+    <a class="list-group-item list-group-item-action {% if '/my_orders/' in request.path %} active{% endif %}"
+       href="{% url 'my_orders' %}">
+       <i class="fa fa-shopping-bag mr-2 text-success"></i> Đơn hàng 
+    </a>
+
+    <a class="list-group-item list-group-item-action {% if '/edit_profile/' in request.path %} active{% endif %}"
+       href="{% url 'edit_profile' %}">
+       <i class="fa fa-user-edit mr-2 text-info"></i> Chỉnh sửa hồ sơ
+    </a>
+
+    <a class="list-group-item list-group-item-action {% if '/change_password/' in request.path %} active{% endif %}"
+       href="{% url 'change_password' %}">
+       <i class="fa fa-key mr-2 text-warning"></i> Đổi mật khẩu
+    </a>
+  </ul>
+
+  <br>
+
+  <a class="btn btn-outline-danger btn-block shadow-sm rounded-pill" href="{% url 'logout' %}">
+    <i class="fa fa-power-off mr-2"></i> Đăng xuất
+  </a>
+</aside>

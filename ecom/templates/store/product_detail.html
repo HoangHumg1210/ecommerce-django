@@ -5,128 +5,236 @@
 
 <section class="section-content padding-y bg">
   <div class="container">
-    <div class="card">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb bg-white shadow-sm rounded px-3 py-2">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'store' %}">Sản phẩm</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ single_product.product_name }}</li>
+      </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm rounded-4">
       <div class="row no-gutters">
-        <aside class="col-md-6">
+        <!-- LEFT: Gallery -->
+        <aside class="col-lg-6 p-3 p-md-4">
           <article class="gallery-wrap">
-            <div class="img-big-wrap">
-              <a href="#"><img src="{{ single_product.image.url }}" /></a>
+            <div class="img-big-wrap mainImage d-flex align-items-center justify-content-center rounded-3 overflow-hidden bg-light" style="min-height:420px;">
+              <img src="{{ single_product.image.url }}" alt="{{ single_product.product_name }}" class="img-fluid main-display" style="transition:transform .25s ease; max-height:520px;" />
             </div>
           </article>
+
+          <!-- Thumbnails: mỗi ảnh một <li> -->
+          <ul class="thumb list-unstyled d-flex flex-wrap gap-2 mt-3" role="listbox" aria-label="Ảnh sản phẩm">
+            <li class="mr-2 mb-2">
+              <a href="{{ single_product.image.url }}" class="thumb-item active" aria-label="Ảnh chính" role="option">
+                <img src="{{ single_product.image.url }}" alt="{{ single_product.product_name }} thumbnail" class="thumb-img" loading="lazy" decoding="async" />
+              </a>
+            </li>
+            {% for i in product_gallery %}
+              <li class="mr-2 mb-2">
+                <a href="{{ i.image.url }}" class="thumb-item" aria-label="Ảnh phụ {{ forloop.counter }}" role="option">
+                  <img src="{{ i.image.url }}" alt="{{ single_product.product_name }} thumbnail {{ forloop.counter }}" class="thumb-img" loading="lazy" decoding="async" />
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
         </aside>
 
-        <main class="col-md-6 border-left">
+        <!-- RIGHT: Info -->
+        <main class="col-lg-6 border-left">
           <form action="{% url 'add_cart' single_product.id %}" method="POST">
             {% csrf_token %}
-            <article class="content-body">
-              <h2 class="title">{{ single_product.product_name }}</h2>
+            <article class="content-body p-4 p-md-5">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h1 class="h4 font-weight-bold mb-0">{{ single_product.product_name }}</h1>
+                {% if single_product.stock > 0 %}
+                  <span class="badge badge-success">Còn hàng</span>
+                {% else %}
+                  <span class="badge badge-danger">Tạm hết</span>
+                {% endif %}
+              </div>
 
               <!-- ⭐ Sao trung bình -->
-              <div class="rating-star">
-                <span class="stars stars-lg" aria-label="Average {{ single_product.averageReview|floatformat:1 }} / 5">
-                  {% with avg=single_product.averageReview %}
-                    <i class="{% if avg >= 1 %}fas fa-star{% elif avg >= 0.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                    <i class="{% if avg >= 2 %}fas fa-star{% elif avg >= 1.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                    <i class="{% if avg >= 3 %}fas fa-star{% elif avg >= 2.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                    <i class="{% if avg >= 4 %}fas fa-star{% elif avg >= 3.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                    <i class="{% if avg >= 5 %}fas fa-star{% elif avg >= 4.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                  {% endwith %}
-                  <span class="ml-1 text-muted">({{ single_product.countReview }} reviews)</span>
-                </span>
+              <div class="d-flex align-items-center mb-3">
+                <div class="rating-star mr-2">
+                  <span class="stars" aria-label="Điểm trung bình {{ single_product.averageReview|floatformat:1 }} / 5">
+                    {% with avg=single_product.averageReview %}
+                      <i class="{% if avg >= 1 %}fas fa-star{% elif avg >= 0.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if avg >= 2 %}fas fa-star{% elif avg >= 1.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if avg >= 3 %}fas fa-star{% elif avg >= 2.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if avg >= 4 %}fas fa-star{% elif avg >= 3.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                      <i class="{% if avg >= 5 %}fas fa-star{% elif avg >= 4.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                    {% endwith %}
+                  </span>
+                </div>
+                <small class="text-muted">{{ single_product.countReview }} đánh giá</small>
               </div>
 
-              <div class="mb-3">
-                <var class="price h4">{{ single_product.price|intcomma }}đ</var>
+              <div class="d-flex align-items-baseline mb-3">
+                <span class="h3 text-primary mb-0 mr-3">{{ single_product.price|intcomma }}đ</span>
+                {% if single_product.old_price %}
+                  <span class="text-muted"><s>{{ single_product.old_price|intcomma }}đ</s></span>
+                {% endif %}
               </div>
 
-              <p>{{ single_product.description }}</p>
+              <p class="text-muted mb-3">{{ single_product.description }}</p>
 
-              <hr />
-              <!-- Variations -->
-              <div class="row">
-                <div class="item-option-select">
-                  <h6>Màu sắc</h6>
-                  <select name="color" class="form-control" required>
+              <div class="bg-light rounded p-3 mb-3 small">
+                <i class="fas fa-shipping-fast mr-1"></i> Giao nhanh 2-4 ngày &nbsp;•&nbsp;
+                <i class="fas fa-undo mr-1"></i> Đổi trả 7 ngày &nbsp;•&nbsp;
+                <i class="fas fa-shield-alt mr-1"></i> Hàng chính hãng
+              </div>
+
+              <!-- Variations & Quantity -->
+              <!-- Styles for variant chips -->
+              <style>
+                :root{ --brand: #ee4d2d; }
+                .variant-group{ display:flex; flex-wrap:wrap; gap:.5rem .65rem; }
+                .variant-radio{ position:absolute; opacity:0; width:0; height:0; }
+                .variant-chip{ position:relative; display:inline-flex; align-items:center; gap:.5rem; padding:.45rem .6rem; min-height:42px;
+                  border:1.5px solid #e5e7eb; border-radius:.5rem; background:#fff; cursor:pointer; user-select:none; }
+                .variant-chip .chip-text{ font-size:.92rem; }
+                .variant-chip.with-thumb{ padding:.35rem .6rem; }
+                .chip-thumb{ width:28px; height:28px; object-fit:cover; border-radius:.35rem; border:1px solid #eee; }
+                /* Active */
+                .variant-radio:checked + .variant-chip{ border-color:var(--brand); box-shadow:0 0 0 2px rgba(238,77,45,.15); }
+                .variant-radio:checked + .variant-chip:after{ content:"¹3"; position:absolute; right:-6px; top:-6px; background:#fff;
+                  color:var(--brand); border:1px solid var(--brand); width:18px; height:18px; line-height:16px; text-align:center; border-radius:50%; font-size:11px; }
+                /* Disabled state (nếu có) */
+                .variant-radio:disabled + .variant-chip{ opacity:.5; cursor:not-allowed; text-decoration:line-through; }
+                /* Size chip more compact */
+                .size-chip{ width:56px; justify-content:center; font-weight:600; }
+              </style>
+
+              <div class="row mb-3">
+                <!-- Color options -->
+                <div class="col-lg-6 mb-3">
+                  <label class="font-weight-bold d-block">Màu sắc</label>
+                  <div class="variant-group" role="radiogroup" aria-label="Chọn màu">
                     {% for i in single_product.variation_set.colors %}
-                      <option value="{{ i.variation_value|lower }}">{{ i.variation_value|capfirst }}</option>
+                      <input class="variant-radio" type="radio" name="color" id="color-{{ forloop.counter }}" value="{{ i.variation_value|lower }}" required>
+                      <label class="variant-chip with-thumb" for="color-{{ forloop.counter }}">
+                        <img class="chip-thumb" src="{{ i.image.url|default:single_product.image.url }}" alt="{{ i.variation_value|capfirst }}">
+                        <span class="chip-text">{{ i.variation_value|capfirst }}</span>
+                      </label>
+                    {% empty %}
+                      <div class="text-muted small">Không có biến thể màu.</div>
                     {% endfor %}
-                  </select>
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="item-option-select">
-                  <h6>Kích cỡ</h6>
-                  <select name="size" class="form-control">
+                <!-- Size options -->
+                <div class="col-lg-6 mb-3">
+                  <label class="font-weight-bold d-block">Kích cỡ</label>
+                  <div class="variant-group" role="radiogroup" aria-label="Chọn kích cỡ">
                     {% for i in single_product.variation_set.sizes %}
-                      <option value="{{ i.variation_value|lower }}">{{ i.variation_value|capfirst }}</option>
+                      <input class="variant-radio" type="radio" name="size" id="size-{{ forloop.counter }}" value="{{ i.variation_value|lower }}" required>
+                      <label class="variant-chip size-chip" for="size-{{ forloop.counter }}">{{ i.variation_value|upper }}</label>
+                    {% empty %}
+                      <div class="text-muted small">Không có biến thể kích cỡ.</div>
                     {% endfor %}
-                  </select>
+                  </div>
                 </div>
               </div>
 
-              <hr />
-              {% if single_product.stock <= 0 %}
-                <h5 class="text-danger">Tạm hết</h5>
-              {% else %}
-                <button type="submit" class="btn btn-primary">
-                  <span class="text">Thêm vào giỏ hàng</span><i class="fas fa-shopping-cart"></i>
+              <div class="d-flex align-items-center mb-4">
+                <div class="input-group qty-spinner">
+                  <div class="input-group-prepend">
+                    <button type="button" class="btn btn-outline-secondary btn-qty" data-delta="-1" aria-label="Giảm">−</button>
+                  </div>
+                  <input id="qty" name="quantity" type="number" min="1" step="1" inputmode="numeric" pattern="[0-9]*" value="1" class="form-control text-center qty-input" aria-label="Số lượng" />
+                  <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-secondary btn-qty" data-delta="1" aria-label="Tăng">+</button>
+                  </div>
+                </div>
+              </div>
+
+              {% if single_product.stock > 0 %}
+                <button type="submit" class="btn btn-primary btn-lg mr-2">
+                  <i class="fas fa-shopping-cart mr-1"></i> Thêm vào giỏ hàng
                 </button>
-                <a href="{% url 'cart' %}" class="btn btn-outline-primary">
-                  <span class="text">Xem giỏ hàng</span><i class="fas fa-eye"></i>
+                <a href="{% url 'cart' %}" class="btn btn-outline-primary btn-lg">
+                  <i class="fas fa-bolt mr-1"></i> Mua ngay
                 </a>
+              {% else %}
+                <h5 class="text-danger">Tạm hết</h5>
               {% endif %}
+
+              <div class="mt-3 small text-muted">
+                <i class="far fa-credit-card mr-1"></i> Hỗ trợ: Visa • MasterCard • PayPal
+              </div>
             </article>
           </form>
         </main>
       </div>
     </div>
 
-    <br>
+    <br />
 
     <div class="row">
-      <div class="col-md-9">
-
+      <div class="col-lg-9">
         <!-- ⭐ Form viết review -->
-        <form action="{% url 'submit_review' single_product.id %}" method="POST">
+        <form action="{% url 'submit_review' single_product.id %}" method="POST" class="mb-4">
           {% csrf_token %}
-          <h5>Đánh giá sản phẩm</h5>
-          <div>
-            <label>Bạn đánh giá sản phẩm này như thế nào?</label><br>
-                <div class="rate">
-  <input type="radio" name="rating" id="r5" value="5" required />
-  <label for="r5" title="5"><i class="fa fa-star"></i></label>
-  <input type="radio" name="rating" id="r4" value="4" />
-  <label for="r4" title="4"><i class="fa fa-star"></i></label>
-  <input type="radio" name="rating" id="r3" value="3" />
-  <label for="r3" title="3"><i class="fa fa-star"></i></label>
-  <input type="radio" name="rating" id="r2" value="2" />
-  <label for="r2" title="2"><i class="fa fa-star"></i></label>
-  <input type="radio" name="rating" id="r1" value="1" />
-  <label for="r1" title="1"><i class="fa fa-star"></i></label>
-</div>
+          <div class="d-flex align-items-center mb-2">
+            <h5 class="mb-0 mr-2">Đánh giá sản phẩm</h5>
+            <small class="text-muted">Cảm ơn bạn đã chia sẻ trải nghiệm</small>
+          </div>
 
+          <!-- CSS rating tối giản, tránh 10 sao & ẩn radio -->
+          <style>
+            .thumb-img{width:68px;height:68px;object-fit:cover;border-radius:10px;border:2px solid transparent;cursor:pointer;transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease}
+            .thumb a.active .thumb-img, .thumb-img:hover{border-color:#ff4d4f;box-shadow:0 0 0 3px rgba(255,77,79,.15);transform:translateY(-2px) scale(1.04)}
+            .mainImage:hover .main-display{transform:scale(1.03)}
+            .rate{display:inline-flex;flex-direction:row-reverse}
+            .rate>input{display:none}
+            .rate>label{cursor:pointer;margin:0 .12rem}
+            .rate>label i{font-size:1.25rem}
+            .rate>input:checked~label i,.rate>label:hover i,.rate>label:hover~label i{color:#ffb503}
+            /* Qty input visible & neat */
+            .qty-spinner{max-width:180px}
+            .qty-input{min-width:84px;max-width:110px;color:#212529!important;background:#fff;font-weight:600;appearance:textfield;-moz-appearance:textfield}
+            .qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+          </style>
 
-
-
-            <br>
-            <div class="form-group">
-              <label>Tiêu đề đánh giá:</label>
-              <input type="text" class="form-control" name="subject" placeholder="Nhập tiêu đề đánh giá">
+          <div class="mb-2">
+            <label class="mb-1">Bạn đánh giá sản phẩm này như thế nào?</label><br />
+            <div class="rate" aria-label="Your rating">
+              <input type="radio" name="rating" id="r5" value="5" required />
+              <label for="r5" title="5"><i class="fa fa-star"></i></label>
+              <input type="radio" name="rating" id="r4" value="4" />
+              <label for="r4" title="4"><i class="fa fa-star"></i></label>
+              <input type="radio" name="rating" id="r3" value="3" />
+              <label for="r3" title="3"><i class="fa fa-star"></i></label>
+              <input type="radio" name="rating" id="r2" value="2" />
+              <label for="r2" title="2"><i class="fa fa-star"></i></label>
+              <input type="radio" name="rating" id="r1" value="1" />
+              <label for="r1" title="1"><i class="fa fa-star"></i></label>
             </div>
-            <br>
-            <div class="form-group">
-              <label>Nội dung đánh giá:</label>
-              <textarea name="review" rows="4" class="form-control" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm"></textarea>
-            </div>
-            <br>
+          </div>
+
+          <div class="form-group">
+            <label>Tiêu đề đánh giá:</label>
+            <input type="text" class="form-control" name="subject" placeholder="Nhập tiêu đề đánh giá" />
+          </div>
+
+          <div class="form-group">
+            <label>Nội dung đánh giá:</label>
+            <textarea name="review" rows="4" class="form-control" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm"></textarea>
+          </div>
+
+          <div class="mt-2">
             {% if user.is_authenticated %}
               {% if orderproduct %}
-                <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Gửi đánh giá</button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-paper-plane mr-1"></i> Gửi đánh giá
+                </button>
               {% else %}
-                <div class="alert alert-warning">Bạn cần mua sản phẩm này để có thể đánh giá.</div>
+                <div class="alert alert-warning mb-0">Bạn cần mua sản phẩm này để có thể đánh giá.</div>
               {% endif %}
             {% else %}
-              <div class="alert alert-info">
+              <div class="alert alert-info mb-0">
                 Vui lòng <a href="{% url 'login' %}" class="alert-link">đăng nhập</a> để đánh giá sản phẩm.
               </div>
             {% endif %}
@@ -134,42 +242,94 @@
           {% include 'includes/alerts.html' %}
         </form>
 
-        <br>
         <header class="section-heading">
-          <h3>Đánh giá từ khách hàng</h3>
+          <h3 class="h5">Đánh giá từ khách hàng</h3>
         </header>
 
         {% for review in reviews %}
-          <article class="box mb-3">
-            <div class="icontext w-100">
-              <div class="text">
-                <span class="date text-muted float-md-right">{{ review.updated_at|date:"d/m/Y H:i" }} </span>
-                <h6 class="mb-1">{{ review.user.full_name }}</h6>
-                <div class="rating-star">
-                  <span class="stars stars-sm">
-                    {% with s=review.rating %}
-                      <i class="{% if s >= 1 %}fas fa-star{% elif s >= 0.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                      <i class="{% if s >= 2 %}fas fa-star{% elif s >= 1.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                      <i class="{% if s >= 3 %}fas fa-star{% elif s >= 2.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                      <i class="{% if s >= 4 %}fas fa-star{% elif s >= 3.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                      <i class="{% if s >= 5 %}fas fa-star{% elif s >= 4.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
-                    {% endwith %}
-                  </span>
-                </div>
-              </div>
+          <article class="box mb-3 p-3 border rounded-3 bg-white shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+              <h6 class="mb-1">{{ review.user.full_name }}</h6>
+              <span class="date text-muted">{{ review.updated_at|date:"d/m/Y H:i" }}</span>
             </div>
-            <div class="mt-3">
-              <h6 class="text-primary">{{ review.subject }}</h6>
-              <p class="text-muted">{{ review.review }}</p>
+            <div class="rating-star mb-2">
+              <span class="stars stars-sm">
+                {% with s=review.rating %}
+                  <i class="{% if s >= 1 %}fas fa-star{% elif s >= 0.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                  <i class="{% if s >= 2 %}fas fa-star{% elif s >= 1.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                  <i class="{% if s >= 3 %}fas fa-star{% elif s >= 2.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                  <i class="{% if s >= 4 %}fas fa-star{% elif s >= 3.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                  <i class="{% if s >= 5 %}fas fa-star{% elif s >= 4.5 %}fas fa-star-half-alt{% else %}far fa-star star-empty{% endif %}"></i>
+                {% endwith %}
+              </span>
             </div>
+            <h6 class="text-primary mb-1">{{ review.subject }}</h6>
+            <p class="text-muted mb-0">{{ review.review }}</p>
           </article>
         {% empty %}
           <div class="alert alert-info">Chưa có đánh giá nào cho sản phẩm này.</div>
         {% endfor %}
-
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  $(function () {
+    // Preload gallery
+    $('.thumb a').each(function () {
+      const u = $(this).attr('href');
+      const im = new Image();
+      im.src = u;
+    });
+
+    function swapMain(src) {
+      const $main = $('.mainImage img');
+      if (!$main.length || $main.attr('src') === src) return;
+      $main.stop(true, true).fadeTo(120, 0.1, function () {
+        $main.attr('src', src).one('load', function () { $main.fadeTo(180, 1); });
+      });
+    }
+
+    // Hover/click đổi ảnh
+    $(document).on('mouseenter', '.thumb a', function (e) {
+      e.preventDefault();
+      const src = $(this).attr('href');
+      $('.thumb a').removeClass('active');
+      $(this).addClass('active');
+      swapMain(src);
+    });
+    $(document).on('click', '.thumb a', function (e) {
+      e.preventDefault();
+      $(this).trigger('mouseenter');
+    });
+
+    // Qty spinner
+    $(document).on('click', '.btn-qty', function () {
+      const $q = $('#qty');
+      const delta = Number(this.dataset.delta || 0);
+      const current = Number($q.val()) || 1;
+      const next = Math.max(1, current + delta);
+      $q.val(next).trigger('change');
+    });
+    $('#qty').on('input', function () {
+      let v = parseInt(this.value, 10);
+      if (isNaN(v) || v < 1) v = 1;
+      this.value = v;
+    });
+
+    // Tự chọn sẵn biến thể đầu tiên
+    $('.variant-group').each(function () {
+      const $first = $(this).find('input[type=radio]:enabled').first();
+      if ($first.length) $first.prop('checked', true).trigger('change');
+    });
+
+    // Ẩn alert sau 3s
+    setTimeout(function () {
+      $('.alert').fadeTo(400, 0).slideUp(400, function () { $(this).remove(); });
+    }, 3000);
+  });
+</script>
+
 
 {% endblock %}

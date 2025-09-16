@@ -4,12 +4,21 @@ from store.models import Product, Variation
 
 
 
-class Payment(models.Model):
+class Payment(models.Model):  
+    STATUS = (
+        ('COMPLETED', 'Hoàn tất'),
+        ('PENDING', 'Đang xử lý'),
+        ('FAILED', 'Thất bại'),
+        ('CANCELED', 'Đã hủy'),
+        ('REFUNDED', 'Đã hoàn tiền'),
+        ('COD', 'Thanh toán khi nhận hàng (COD)'),
+    )
+
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     payment_id = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100)
     amount_paid = models.CharField(max_length=100) # this is the total amount paid
-    status = models.CharField(max_length=100)
+    status = models.CharField(max_length=100, choices=STATUS, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

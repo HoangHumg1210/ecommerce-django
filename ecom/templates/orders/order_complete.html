@@ -41,7 +41,7 @@
                                         <li><strong>Mã đơn hàng:</strong> {{ order_number }}</li>
                                         <li><strong>Mã giao dịch:</strong> {{ transID }}</li>
                                         <li><strong>Ngày đặt:</strong> {{ order.created_at }}</li>
-                                        <li><strong>Trạng thái:</strong> ĐÃ THANH TOÁN</li>
+                                        <li><strong>Trạng thái:</strong> {{ order.payment.get_status_display }}</li>
                                     </ul>
                                 </div>
                             </div>

@@ -26,7 +26,6 @@
   color: #ddd !important;
 }
 
-
 .rating-star i,
 .stars i,
 .rating-star .fa-star,
@@ -40,4 +39,98 @@
 .rating-star .star-empty,
 .stars .star-empty {
   color: #ddd !important;
+}
+
+ul.thumb {
+  margin: 0 auto;
+  padding: 0;
+  float: left;
+}
+
+ul.thumb li {
+  list-style: none;
+  margin: 10px;
+}
+
+ul.thumb li img {
+  width: 80px;
+  height: 80px;
+  border: 1px solid grey;
+}
+
+/* Logo cân đối */
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  height: 80px;               /* Chiều cao header */
+}
+
+/* Tăng chiều cao header + phóng logo */
+.section-header .header-main .brand-wrap{
+  display:flex; align-items:center;
+  height: 120px;                  /* muốn cao hơn thì tăng số này */
+}
+
+.section-header .header-main .brand-wrap .logo{
+  max-height: 100px;              /* muốn logo to hơn thì tăng lên 110–120 */
+  width:auto; height:auto; display:block; object-fit:contain;
+}
+
+/* Nếu vẫn bị file khác đè, dùng selector mạnh hơn + !important (tạm thời) */
+header.section-header .header-main .brand-wrap .logo{
+  max-height: 100px !important;
+}
+
+
+/* ================= Footer ================= */
+.section-footer .footer-logo {
+  max-height:36px !important;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+}
+
+.footer-contact li { margin:.35rem 0; }
+.footer-contact i { width:18px; text-align:center; color:#6c757d; margin-right:.4rem; }
+
+.section-footer a { color:#4a5568; }
+.section-footer a:hover { color:#2b6cb0; text-decoration:none; }
+
+/* Socials */
+.section-footer .socials a {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; margin-right:.35rem;
+  border-radius:50%; background:#f5f6f8; color:#5b6b7b; transition:.2s;
+}
+.section-footer .socials a:hover { background:#e9eef5; color:#1a73e8; }
+
+/* Payment icons với màu thương hiệu */
+.section-footer .pay-badges i { font-size:28px; margin-right:.4rem; }
+.section-footer .pay-badges i:last-child { margin-right:0; }
+
+.section-footer .pay-badges .fa-cc-visa       { color:#1a1f71 !important; }  /* Visa xanh */
+
+.section-footer .pay-badges .fa-cc-paypal     { color:#003087 !important; }  /* PayPal xanh */
+
+
+/* Footer title */
+.footer-title { color:#111 !important; letter-spacing:.02em; }
+
+.section-footer .pay-badges {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.section-footer .pay-badges i {
+  font-size: 35px;
+  color: #003087; /* PayPal xanh */
+}
+
+.section-footer .pay-badges .pay-momo,
+.section-footer .pay-badges .pay-cod {
+  height: 32px;
+  width: auto;
+  display: inline-block;
+  object-fit: contain;
 }

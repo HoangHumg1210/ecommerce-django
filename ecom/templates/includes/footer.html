@@ -1,24 +1,112 @@
+{#<!-- ========================= FOOTER ========================= -->#}
+{#<footer class="section-footer border-top">#}
+{#  <div class="container">#}
+{#    <section class="footer-bottom border-top row">#}
+{#      <div class="col-md-2">#}
+{#        <p class="text-muted">&copy; Double H Company</p>#}
+{#      </div>#}
+{#      <div class="col-md-8 text-md-center">#}
+{#        <span class="px-2">Email: hungdiem1210@gmail.com</span>#}
+{#        <span class="px-2">Hotline: +84 8888171717</span>#}
+{#        <span class="px-2">Trụ sở chính: 31c Phố Viên, Cổ Nhuế, Bắc Từ Liêm, Hà Nội</span>#}
+{#      </div>#}
+{#      <div class="col-md-2 text-md-right text-muted">#}
+{#        <i class="fab fa-lg fa-cc-visa"></i>#}
+{#        <i class="fab fa-lg fa-cc-paypal"></i>#}
+{#        <i class="fab fa-lg fa-cc-mastercard"></i>#}
+{#      </div>#}
+{#    </section>#}
+{#  </div>#}
+{#</footer>#}
+{#<!-- ========================= FOOTER END // ========================= -->#}
+{##}
+{#<!-- jQuery: ưu tiên dùng bản đã tải ở base.html. Nếu chưa có, fallback CDN -->#}
+{#<script>#}
+{#  (function(){#}
+{#    if (!window.jQuery) {#}
+{#      var s = document.createElement('script');#}
+{#      s.src = 'https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js';#}
+{#      document.head.appendChild(s);#}
+{#    }#}
+{#  })();#}
+{#</script>#}
+{##}
+{#<script>#}
+{#  // Đổi ảnh chính khi click thumbnail + hiệu ứng mượt + set active#}
+{#  (function(){#}
+{#    function swapMain(src){#}
+{#      var $main = $('.mainImage img');#}
+{#      if (!$main.length || $main.attr('src') === src) return;#}
+{#      $main.stop(true,true).fadeTo(120, 0.08, function(){#}
+{#        $main.attr('src', src).one('load', function(){#}
+{#          $main.fadeTo(160, 1);#}
+{#        });#}
+{#      });#}
+{#    }#}
+{#    // Uỷ quyền sự kiện để tránh lỗi khi DOM thay đổi#}
+{#    $(document).on('click', '.thumb a', function(e){#}
+{#      e.preventDefault();#}
+{#      var src = $(this).attr('href');#}
+{#      $('.thumb a').removeClass('active');#}
+{#      $(this).addClass('active');#}
+{#      swapMain(src);#}
+{#    });#}
+{#  })();#}
+{#</script>#}
+
+
+{% load static %}
 <!-- ========================= FOOTER ========================= -->
-<footer class="section-footer border-top">
-  <div class="container">
-    <section class="footer-bottom border-top row">
-      <div class="col-md-2">
-        <p class="text-muted">&copy Double H Company</p>
+<footer class="section-footer border-top bg-white">
+  <div class="container py-4">
+    <div class="row align-items-start">
+      <!-- Brand + slogan -->
+      <div class="col-12 col-md-4 mb-4 mb-md-0">
+        <div class="d-flex align-items-center mb-2">
+{#          <img src="{% static 'images/logo_2.png' %}" alt="Double H" class="footer-logo mr-2" style="max-height:36px;">#}
+          <strong class="mb-0">H2H Company</strong>
+        </div>
+        <p class="text-muted small mb-3">Mua sắm thuận tiện – Giao nhanh – Hàng chính hãng.</p>
+        <div class="socials">
+          <a href="https://www.facebook.com/TuvancongtacsinhvienHUMG" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.youtube.com" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
       </div>
-      <div class="col-md-8 text-md-center">
-        <span class="px-2">Email: hungdiem1210@gmail.com</span>
-        <span class="px-2">Hotline: +84 8888171717</span>
-        <span class="px-2"
-          >Trụ sở chính: 31c Phố Viên, Cổ Nhuế, Bắc Từ Liêm, Hà Nội</span
-        >
+
+      <!-- Liên hệ -->
+      <div class="col-12 col-md-5 mb-4 mb-md-0">
+        <h6 class="text-uppercase text-muted mb-3">Liên hệ</h6>
+        <ul class="list-unstyled footer-contact mb-0">
+          <li><i class="far fa-envelope"></i> <a href="mailto:hungdiem1210@gmail.com">hungdiem1210@gmail.com</a></li>
+          <li><i class="fas fa-phone"></i> <a href="tel:+848888171717">+84 8888171717</a></li>
+          <li><i class="fas fa-map-marker-alt"></i> 31c Phố Viên, Cổ Nhuế, Bắc Từ Liêm, Hà Nội</li>
+        </ul>
       </div>
-      <div class="col-md-2 text-md-right text-muted">
-        <i class="fab fa-lg fa-cc-visa"></i>
-        <i class="fab fa-lg fa-cc-paypal"></i>
-        <i class="fab fa-lg fa-cc-mastercard"></i>
+
+      <!-- Thanh toán -->
+      <div class="col-12 col-md-3">
+        <h6 class="footer-title text-uppercase mb-3">Thanh toán an toàn</h6>
+        <div class="pay-badges">
+          <i class="fab fa-cc-visa"></i>
+          <i class="fab fa-cc-paypal"></i>
+            <img src="{% static 'images/cod_logo.jpg' %}" alt="COD" class="pay-cod">
+        </div>
       </div>
-    </section>
+    </div>
   </div>
-  <!-- //container -->
+
+  <div class="border-top">
+    <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between py-3">
+      <p class="text-muted small mb-2 mb-md-0">© {{ now|date:"Y" }} H2H Store.</p>
+      <ul class="list-inline small mb-0">
+        <li class="list-inline-item"><a href="#">Chính sách bảo mật</a></li>
+        <li class="list-inline-item">•</li>
+        <li class="list-inline-item"><a href="#">Điều khoản sử dụng</a></li>
+        <li class="list-inline-item">•</li>
+        <li class="list-inline-item"><a href="{% url 'store' %}">Cửa hàng</a></li>
+      </ul>
+    </div>
+  </div>
 </footer>
-<!-- ========================= FOOTER END // ========================= -->
+<!-- ========================= FOOTER END ========================= -->

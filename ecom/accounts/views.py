@@ -1,6 +1,7 @@
+from django.contrib.messages.api import success
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
-from orders.models import Order
+from orders.models import Order, OrderProduct
 from .forms import RegistrationForm, UserForm, UserProfileForm
 from .models import Account, UserProfile
 from django.contrib import messages, auth
@@ -42,6 +43,13 @@ def register(request):
             user.phone_number = phone_number
             user.save()
 
+            # Create User Profile
+
+            profile = UserProfile()
+            profile.user_id = user.id
+            profile.profile_picture = 'default/default-user.jpg'
+            profile.save()
+
             # User Activation
             current_site = get_current_site(request)
             mail_subject = 'Vui lòng kích hoạt tài khoản của bạn'
@@ -71,7 +79,6 @@ def login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-
 
         user = auth.authenticate(email=email, password=password)
         
@@ -139,9 +146,10 @@ def activate(request, uidb64, token ):
 def dashboard(request):
     orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
     orders_count = orders.count()
-
+    userprofile = get_object_or_404(UserProfile, user=request.user)
     context = {
         'orders_count': orders_count,
+        'userprofile': userprofile,
     }
     return render(request, 'accounts/dashboard.html', context)
 
@@ -205,6 +213,7 @@ def resetPassword(request):
     else:        
         return render(request, 'accounts/resetPassword.html')
 
+@login_required(login_url='login')
 def my_orders(request):
     orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
     context = {
@@ -213,22 +222,67 @@ def my_orders(request):
 
     return render(request, 'accounts/my_orders.html', context)
 
+@login_required(login_url='login')
 def edit_profile(request):
     userprofile = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
             messages.success(request, 'Cập nhật thành công')
             return redirect('edit_profile')
-        else:
-            user_form = UserForm(instance=request.user)
-            profile_form = UserProfileForm(instance=request.user.profile)
-        context = {
-            'user_form': user_form,
-            'profile_form': profile_form,
-        }
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+    }
+    return render(request, 'accounts/edit_profile.html', context)
 
-    return render(request, 'accounts/edit_profile.html')
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+
+@login_required(login_url='login')
+def change_password(request):
+    if request.method == 'POST':
+        # Lấy đúng tên trường từ form
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password1')
+        confirm_password = request.POST.get('confirm_password2')
+
+        user = request.user
+        # 1. Check mật khẩu hiện tại đúng không
+        if not user.check_password(current_password):
+            messages.error(request, "Mật khẩu hiện tại không đúng.")
+        # 2. Check 2 trường mật khẩu mới khớp nhau
+        elif new_password != confirm_password:
+            messages.error(request, "Mật khẩu mới và nhập lại không khớp.")
+        # 3. Check độ dài mật khẩu mới (hoặc các rule khác nếu cần)
+        elif len(new_password) < 6:
+            messages.error(request, "Mật khẩu mới phải có ít nhất 6 ký tự.")
+        else:
+            user.set_password(new_password)
+            user.save()
+            update_session_auth_hash(request, user)  # Để giữ đăng nhập
+            messages.success(request, "Đổi mật khẩu thành công!")
+            return redirect('dashboard')
+    return render(request, 'accounts/change_password.html')
+
+@login_required(login_url='login')
+def order_detail(request, order_id):
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    subtotal = 0
+    for i in order_detail:
+        subtotal += i.product_price * i.quantity
+    context = {
+        'order_detail': order_detail,
+        'order': order,
+        'subtotal': subtotal,
+    }
+    return render(request, 'accounts/order_detail.html', context)

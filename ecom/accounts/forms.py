@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from .models import Account
+from .models import UserProfile
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
@@ -53,13 +54,18 @@ class UserForm(forms.ModelForm):
             self.fields[field].widget.attrs['class'] = 'form-control'
 
 class UserProfileForm(forms.ModelForm):
-    profile_picture = forms.ImageField(required=False, error_messages={'invalid': "Image files only"},widget=forms.FileInput(attrs={'class':'form-control'}))
+    profile_picture = forms.ImageField(
+        required=False,
+        error_messages={'invalid': "Image files only"},
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
+
     class Meta:
-        model = Account
+        model = UserProfile
         fields = ('address_line_1', 'city', 'state', 'profile_picture')
 
     def __init__(self, *args, **kwargs):
-        super(UserForm, self).__init__(*args, **kwargs)
+        super(UserProfileForm, self).__init__(*args, **kwargs)   
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
 
