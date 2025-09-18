@@ -30,74 +30,60 @@ from django.http import JsonResponse
 import json
 
 def payments(request):
-    if request.method == "POST":
-        try:
-            body = json.loads(request.body)
-            order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+    if request.method != "POST":
+        return JsonResponse({'status': 'fail', 'message': 'Invalid request.'}, status=400)
 
-            payment = Payment.objects.create(
-                user=request.user,
-                payment_id=body['transactionID'],
-                payment_method=body['payment_method'],
-                amount_paid=order.order_total,
-                status=body['status'],
+    try:
+        body = json.loads(request.body)
+
+        # DÙNG MÃ ĐƠN NỘI BỘ, KHÔNG DÙNG orderID CỦA PAYPAL
+        order_no = body.get('local_order_number')
+        order = Order.objects.get(user=request.user, is_ordered=False, order_number=order_no)
+
+        # payment_id: ưu tiên transactionID; nếu trống (COD) thì tạo UUID
+        tx_id = body.get('transactionID')
+        if not tx_id:
+            import uuid
+            tx_id = str(uuid.uuid4())
+
+        payment = Payment.objects.create(
+            user=request.user,
+            payment_id=tx_id,
+            payment_method=body.get('payment_method') or 'COD',
+            amount_paid=body.get('amount') or order.order_total,
+            status=body.get('status') or 'COD',
+        )
+
+        # Chốt đơn
+        order.payment = payment
+        order.is_ordered = True
+        order.save()
+
+        # Chuyển CartItem -> OrderProduct
+        cart_items = CartItem.objects.filter(user=request.user)
+        for item in cart_items:
+            op = OrderProduct.objects.create(
+                order=order, payment=payment, user=request.user,
+                product=item.product, quantity=item.quantity,
+                product_price=item.product.price, ordered=True,
             )
+            op.variations.set(item.variations.all())
+            op.save()
 
-            order.payment = payment
-            order.is_ordered = True
-            order.save()
+            # Trừ tồn
+            p = item.product
+            p.stock = max(0, p.stock - item.quantity)
+            p.save()
 
-            cart_items = CartItem.objects.filter(user=request.user)
-            for item in cart_items:
-                orderproduct = OrderProduct.objects.create(
-                    order=order,
-                    payment=payment,
-                    user=request.user,
-                    product=item.product,
-                    quantity=item.quantity,
-                    product_price=item.product.price,
-                    ordered=True,
-                )
-                # Gán variations đúng cách
-                cart_item = CartItem.objects.get(id=item.id)
-                product_variation = cart_item.variations.all()
-                orderproduct = OrderProduct.objects.get(id=orderproduct.id)
-                orderproduct.variations.set(product_variation)
-                orderproduct.save()
+        cart_items.delete()
 
-                product = Product.objects.get(id=item.product_id)
-                product.stock -= item.quantity
-                product.save()
-            CartItem.objects.filter(user=request.user).delete()
-            # print('Xóa thành công!')
-            order_time = timezone.localtime(order.created_at)
-            order_products = order.orderproduct_set.all()  # Lấy toàn bộ sản phẩm đã đặt
-            mail_subject = 'Cảm ơn bạn đã đặt hàng'
-            message = render_to_string('orders/order_recieved_email.html', {
-                'user': request.user,
-                'order': order,
-                'shop_name': 'Double H Store',
-                'order_time': order_time,
-                'order_products': order_products,
-                'year': order_time.year,
-            })
-            to_email = request.user.email
-            send_email = EmailMessage(mail_subject, message, to=[to_email])
-            send_email.content_subtype = "html"
-            send_email.send()
+        return JsonResponse({'order_number': order.order_number, 'payment_id': payment.payment_id})
 
-            data = {
-                'order_number': order.order_number,
-                'payment_id': payment.payment_id,
-            }
+    except Order.DoesNotExist:
+        return JsonResponse({'status': 'fail', 'message': 'Order not found (wrong local_order_number or already ordered).'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'fail', 'message': str(e)}, status=500)
 
-
-
-            return JsonResponse(data)
-        except Exception as e:
-            return JsonResponse({'status': 'fail', 'message': str(e)}, status=500)
-    else:
-        return JsonResponse({'status': 'fail', 'message': 'Invalid request.'})
 
 
 def place_order(request, total=0, quantity=0):

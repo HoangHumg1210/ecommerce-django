@@ -17,15 +17,16 @@
 
     <div class="card border-0 shadow-sm rounded-4">
       <div class="row no-gutters">
-        <!-- LEFT: Gallery -->
+
         <aside class="col-lg-6 p-3 p-md-4">
           <article class="gallery-wrap">
-            <div class="img-big-wrap mainImage d-flex align-items-center justify-content-center rounded-3 overflow-hidden bg-light" style="min-height:420px;">
+              <div class="img-big-wrap mainImage d-flex align-items-center justify-content-center rounded-3 overflow-hidden" style="min-height:420px; background:#fff;">
+
               <img src="{{ single_product.image.url }}" alt="{{ single_product.product_name }}" class="img-fluid main-display" style="transition:transform .25s ease; max-height:520px;" />
             </div>
           </article>
 
-          <!-- Thumbnails: mỗi ảnh một <li> -->
+
           <ul class="thumb list-unstyled d-flex flex-wrap gap-2 mt-3" role="listbox" aria-label="Ảnh sản phẩm">
             <li class="mr-2 mb-2">
               <a href="{{ single_product.image.url }}" class="thumb-item active" aria-label="Ảnh chính" role="option">
@@ -90,22 +91,44 @@
               <!-- Variations & Quantity -->
               <!-- Styles for variant chips -->
               <style>
-                :root{ --brand: #ee4d2d; }
-                .variant-group{ display:flex; flex-wrap:wrap; gap:.5rem .65rem; }
-                .variant-radio{ position:absolute; opacity:0; width:0; height:0; }
-                .variant-chip{ position:relative; display:inline-flex; align-items:center; gap:.5rem; padding:.45rem .6rem; min-height:42px;
-                  border:1.5px solid #e5e7eb; border-radius:.5rem; background:#fff; cursor:pointer; user-select:none; }
-                .variant-chip .chip-text{ font-size:.92rem; }
-                .variant-chip.with-thumb{ padding:.35rem .6rem; }
-                .chip-thumb{ width:28px; height:28px; object-fit:cover; border-radius:.35rem; border:1px solid #eee; }
-                /* Active */
-                .variant-radio:checked + .variant-chip{ border-color:var(--brand); box-shadow:0 0 0 2px rgba(238,77,45,.15); }
-                .variant-radio:checked + .variant-chip:after{ content:"¹3"; position:absolute; right:-6px; top:-6px; background:#fff;
-                  color:var(--brand); border:1px solid var(--brand); width:18px; height:18px; line-height:16px; text-align:center; border-radius:50%; font-size:11px; }
-                /* Disabled state (nếu có) */
-                .variant-radio:disabled + .variant-chip{ opacity:.5; cursor:not-allowed; text-decoration:line-through; }
-                /* Size chip more compact */
-                .size-chip{ width:56px; justify-content:center; font-weight:600; }
+                /* Styles for variant chips */
+:root{ --brand: #ee4d2d; }
+.variant-group{ display:flex; flex-wrap:wrap; gap:.5rem .65rem; }
+.variant-radio{ position:absolute; opacity:0; width:0; height:0; }
+.variant-chip{ position:relative; display:inline-flex; align-items:center; gap:.5rem; padding:.45rem .6rem; min-height:42px;
+  border:1.5px solid #e5e7eb; border-radius:.5rem; background:#fff; cursor:pointer; user-select:none; }
+.variant-chip .chip-text{ font-size:.92rem; }
+.variant-chip.with-thumb{ padding:.35rem .6rem; }
+.chip-thumb{ width:28px; height:28px; object-fit:cover; border-radius:.35rem; border:1px solid #eee; }
+
+/* Active */
+.variant-radio:checked + .variant-chip{
+  border-color:var(--brand);
+  box-shadow:0 0 0 2px rgba(238,77,45,.15);
+}
+.variant-radio:checked + .variant-chip::after{
+  content:"\2713"; /* ✓ */
+  position:absolute;
+  right:-6px; top:-6px;
+  background:#fff;
+  color:var(--brand);
+  border:1px solid var(--brand);
+  width:18px; height:18px;
+  line-height:16px;
+  text-align:center;
+  border-radius:50%;
+  font-size:12px;
+  font-weight:700;
+}
+
+/* Disabled state (nếu có) */
+.variant-radio:disabled + .variant-chip{
+  opacity:.5; cursor:not-allowed; text-decoration:line-through;
+}
+
+/* Size chip more compact */
+.size-chip{ width:56px; justify-content:center; font-weight:600; }
+
               </style>
 
               <div class="row mb-3">
@@ -154,15 +177,19 @@
                 <button type="submit" class="btn btn-primary btn-lg mr-2">
                   <i class="fas fa-shopping-cart mr-1"></i> Thêm vào giỏ hàng
                 </button>
-                <a href="{% url 'cart' %}" class="btn btn-outline-primary btn-lg">
-                  <i class="fas fa-bolt mr-1"></i> Mua ngay
-                </a>
+{#                <a href="{% url 'cart' %}" class="btn btn-outline-primary btn-lg">#}
+{#                  <i class="fas fa-bolt mr-1"></i> Mua ngay#}
+{#                </a>#}
+                  <button type="submit" formaction="{% url 'checkout' %}" class="btn btn-outline-primary btn-lg">
+                     <i class="fas fa-bolt mr-1"></i> Mua ngay
+                  </button>
+
               {% else %}
                 <h5 class="text-danger">Tạm hết</h5>
               {% endif %}
 
               <div class="mt-3 small text-muted">
-                <i class="far fa-credit-card mr-1"></i> Hỗ trợ: Visa • MasterCard • PayPal
+                <i class="far fa-credit-card mr-1"></i> Hỗ trợ: • COD • PayPal
               </div>
             </article>
           </form>
@@ -276,7 +303,6 @@
 
 <script>
   $(function () {
-    // Preload gallery
     $('.thumb a').each(function () {
       const u = $(this).attr('href');
       const im = new Image();
@@ -318,13 +344,13 @@
       this.value = v;
     });
 
-    // Tự chọn sẵn biến thể đầu tiên
+
     $('.variant-group').each(function () {
       const $first = $(this).find('input[type=radio]:enabled').first();
       if ($first.length) $first.prop('checked', true).trigger('change');
     });
 
-    // Ẩn alert sau 3s
+
     setTimeout(function () {
       $('.alert').fadeTo(400, 0).slideUp(400, function () { $(this).remove(); });
     }, 3000);

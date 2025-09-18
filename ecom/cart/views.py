@@ -16,50 +16,54 @@ def _cart_id(request):
 def add_cart(request, product_id):
     product = Product.objects.get(id=product_id)
     product_variation = []
+
+    # LẤY SỐ LƯỢNG NGƯỜI DÙNG CHỌN (mặc định 1)
+    qty = 1
     if request.method == 'POST':
-        for item in request.POST:
-            key = item
-            value = request.POST[key]
+        # quantity có thể là input type="number" hoặc hidden
+        qty = int(request.POST.get('quantity', 1))
+
+        # gom variations
+        for key, value in request.POST.items():
             try:
                 variation = Variation.objects.get(
-                    product=product, 
-                    variation_category__iexact=key, 
+                    product=product,
+                    variation_category__iexact=key,
                     variation_value__iexact=value
                 )
                 product_variation.append(variation)
             except Variation.DoesNotExist:
                 pass
 
-    cart, created = Cart.objects.get_or_create(cart_id=_cart_id(request))
+    cart, _ = Cart.objects.get_or_create(cart_id=_cart_id(request))
     cart.save()
 
-    # Nếu user đã login thì gắn cả user, nếu chưa thì chỉ gắn cart
+    # lọc cart_items theo user hoặc cart
     if request.user.is_authenticated:
         cart_items = CartItem.objects.filter(product=product, user=request.user)
     else:
         cart_items = CartItem.objects.filter(product=product, cart=cart)
 
-    found = False
+    # so khớp biến thể
     input_var_set = set((v.variation_category, v.variation_value) for v in product_variation)
-
     for item in cart_items:
         item_var_set = set((v.variation_category, v.variation_value) for v in item.variations.all())
         if input_var_set == item_var_set:
-            item.quantity += 1
+            item.quantity += qty           # <<< CỘNG THEO SỐ LƯỢNG CHỌN
             item.save()
-            found = True
             break
-
-    if not found:
+    else:
+        # chưa có item trùng biến thể -> tạo mới với đúng qty
+        params = dict(product=product, quantity=qty, cart=cart)
         if request.user.is_authenticated:
-            cart_item = CartItem.objects.create(product=product, quantity=1, cart=cart, user=request.user)
-        else:
-            cart_item = CartItem.objects.create(product=product, quantity=1, cart=cart)
+            params['user'] = request.user
+        cart_item = CartItem.objects.create(**params)
         if product_variation:
             cart_item.variations.add(*product_variation)
         cart_item.save()
 
     return redirect('cart')
+
 
 
 

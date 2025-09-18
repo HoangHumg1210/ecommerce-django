@@ -21,6 +21,12 @@ class CartItem(models.Model):    #CartItem: Một sản phẩm nằm trong giỏ
     quantity = models.IntegerField() #quantity: Số lượng sản phẩm này trong giỏ.
     is_active = models.BooleanField(default=True) #is_active: Cho phép “ẩn” CartItem thay vì xóa cứng.
     
+    variations = models.ManyToManyField(
+        Variation,
+        through='CartItemVariation',
+        blank=True
+    )
+    
     #sub_total(): Tính tổng tiền của sản phẩm đó (giá * số lượng).
     def sub_total(self):
         return self.product.price * self.quantity
@@ -29,5 +35,12 @@ class CartItem(models.Model):    #CartItem: Một sản phẩm nằm trong giỏ
         return self.product.product_name
     
 
+class CartItemVariation(models.Model):
+    cartitem = models.ForeignKey(CartItem, on_delete=models.CASCADE)
+    variation = models.ForeignKey(Variation, on_delete=models.CASCADE)
 
+    class Meta:
+        db_table = 'cart_cartitem_variations'   # bảng đã có sẵn
+        managed = False                         # không tạo migration mới
+        unique_together = (('cartitem', 'variation'),)
     

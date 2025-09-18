@@ -77,3 +77,12 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return self.product.product_name
+    
+class OrderProductVariation(models.Model):
+    orderproduct = models.ForeignKey(OrderProduct, on_delete=models.CASCADE)
+    variation = models.ForeignKey(Variation, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'orders_orderproduct_variations'
+        managed = False
+        unique_together = (('orderproduct', 'variation'),)
