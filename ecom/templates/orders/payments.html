@@ -109,6 +109,13 @@
             <dl class="row mb-0">
               <dt class="col-6">Tạm tính:</dt>
               <dd class="col-6 text-right">{{ total|floatformat:"0"|intcomma }}₫</dd>
+
+              <!-- Giảm giá (voucher) -->
+              <dt class="col-6">Giảm giá:</dt>
+              <dd class="col-6 text-right">
+                <span id="voucher_discount_view">0₫</span>
+              </dd>
+
               <dt class="col-6">Thuế (2%):</dt>
               <dd class="col-6 text-right">{{ tax|floatformat:"0"|intcomma }}₫</dd>
               <dt class="col-6 font-weight-bold h5 mt-2" style="font-size:1.18rem">Tổng thanh toán:</dt>
@@ -116,6 +123,20 @@
                 {{ grand_total|floatformat:"0"|intcomma }}₫
               </dd>
             </dl>
+
+            <!-- VOUCHER form -->
+            <div class="mt-3">
+              <label class="font-weight-bold">Mã giảm giá</label>
+              <div class="input-group">
+                <input type="text" id="voucher_code" class="form-control" placeholder="Nhập mã (ví dụ: SALE10)">
+                <div class="input-group-append">
+                  <button type="button" id="apply-voucher" class="btn btn-outline-primary">Áp dụng</button>
+                  <button type="button" id="remove-voucher" class="btn btn-outline-secondary">Huỷ</button>
+                </div>
+              </div>
+              <small id="voucher_msg" class="form-text text-muted"></small>
+            </div>
+
             <hr>
             <div class="text-center mb-3">
               <img src="{% static 'images/misc/payments.png' %}" height="28" alt="Phương thức thanh toán">
@@ -167,6 +188,20 @@ function getPaypalAmount() {
   return isNaN(val) ? '0.00' : val.toFixed(2);
 }
 
+// Parse số VND từ string/DOM:
+function parseVND(str){
+  if(!str) return 0;
+  const n = String(str).replace(/[^\d.-]/g, '');
+  const v = parseFloat(n);
+  return isNaN(v) ? 0 : v;
+}
+// Format tiền VND
+function fmtVND(n){
+  try {
+    return new Intl.NumberFormat('vi-VN').format(Math.max(0, Math.round(n))) + '₫';
+  } catch(e){ return n + '₫'; }
+}
+
 // ========== Consts ==========
 const url = "{% url 'payments' %}";
 const csrftoken = getCookie('csrftoken');
@@ -187,6 +222,72 @@ function togglePM() {
 codRadio.addEventListener('change', togglePM);
 ppRadio.addEventListener('change', togglePM);
 togglePM(); // init
+
+// ====== Voucher AJAX ======
+const applyBtn = document.getElementById('apply-voucher');
+const removeBtn = document.getElementById('remove-voucher');
+const vcInput  = document.getElementById('voucher_code');
+const vcMsg    = document.getElementById('voucher_msg');
+
+function getCurrentTotals(){
+  const total = parseVND("{{ total|floatformat:'0' }}");
+  const tax   = parseVND("{{ tax|floatformat:'0' }}");
+  const grand = parseVND("{{ grand_total|floatformat:'0' }}");
+  return { total, tax, grand };
+}
+function updateTotalsOnUI(discount){
+  const { total, tax } = getCurrentTotals();
+  const newGrand = Math.max(0, total - discount + tax);
+  // Giảm giá
+  document.getElementById('voucher_discount_view').innerText = fmtVND(discount);
+  // Tổng thanh toán
+  const grandNode = document.querySelector('dd.text-right.font-weight-bold.h5.mt-2.text-success');
+  if (grandNode) grandNode.innerText = fmtVND(newGrand);
+  // PayPal USD
+  const usd = (newGrand / 26389).toFixed(2);
+  document.getElementById('paypal_amount').value = usd;
+}
+
+applyBtn.addEventListener('click', function(){
+  const code = vcInput.value.trim();
+  const { total } = getCurrentTotals();
+  fetch("{% url 'apply_voucher' %}", {
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-CSRFToken':csrftoken},
+    body: JSON.stringify({ code: code, subtotal: total })
+  })
+  .then(r => r.json().then(j => ({ ok: r.ok, data: j })))
+  .then(({ok, data}) => {
+    vcMsg.className = 'form-text ' + (ok ? 'text-success' : 'text-danger');
+    vcMsg.innerText = data.message || (ok ? 'Áp dụng thành công' : 'Không áp dụng được');
+    if(ok){
+      updateTotalsOnUI(data.discount || 0);
+    }else{
+      updateTotalsOnUI(0);
+    }
+  })
+  .catch(err => {
+    vcMsg.className = 'form-text text-danger';
+    vcMsg.innerText = 'Có lỗi khi áp mã. Thử lại sau.';
+    console.error(err);
+  });
+});
+
+removeBtn.addEventListener('click', function(){
+  fetch("{% url 'remove_voucher' %}", {
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-CSRFToken':csrftoken},
+    body: JSON.stringify({})
+  })
+  .then(r => r.json())
+  .then(data => {
+    vcMsg.className = 'form-text text-muted';
+    vcMsg.innerText = data.message || 'Đã bỏ mã giảm giá.';
+    updateTotalsOnUI(0);
+    vcInput.value = '';
+  })
+  .catch(err => console.error(err));
+});
 
 // ========== COD flow ==========
 codBtn.addEventListener('click', function(){

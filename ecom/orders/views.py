@@ -21,7 +21,7 @@ import datetime
 import re
 import json
 from django.http import JsonResponse
-from .models import OrderProduct, Product, Order, Payment
+from .models import OrderProduct, Order, Payment
 from store.models import Product
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string

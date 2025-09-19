@@ -4,6 +4,9 @@ from store.models import Product, Variation
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+from decimal import Decimal
+from .utils import check_voucher
+from django.contrib import messages
 # Create your views here.
 
 
@@ -162,3 +165,24 @@ def decrease_cart_item(request, cart_item_id):
     else:
         cart_item.delete()
     return redirect('cart')
+
+def apply_voucher(request):
+    if request.method == "POST":
+        code = request.POST.get("voucher_code", "")
+        subtotal = Decimal(request.POST.get("subtotal", "0"))
+        ok, discount, msg, v = check_voucher(request, subtotal, code)
+        if ok:
+            request.session["voucher_code"] = v.code
+            request.session["voucher_discount"] = float(discount)
+            messages.success(request, msg)
+        else:
+            request.session.pop("voucher_code", None)
+            request.session.pop("voucher_discount", None)
+            messages.warning(request, msg)
+    return redirect(request.POST.get("next") or "cart")
+
+def remove_voucher(request):
+    request.session.pop("voucher_code", None)
+    request.session.pop("voucher_discount", None)
+    messages.info(request, "Đã bỏ mã giảm giá.")
+    return redirect(request.GET.get("next") or "cart")
