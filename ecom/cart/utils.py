@@ -17,7 +17,10 @@ def check_voucher(request, subtotal: Decimal, code: str):
         return False, Decimal("0"), "Bạn chưa nhập mã.", None
 
     try:
-        v = Voucher.objects.get(code__iexact=code, is_active=True)
+        v = (Voucher.objects
+           .filter(code__iexact=code, is_active=True)
+           .order_by('-id')  # hoặc '-start_at' nếu bạn muốn ưu tiên theo ngày bắt đầu
+           .first())
     except Voucher.DoesNotExist:
         return False, Decimal("0"), "Mã không tồn tại hoặc đã ngừng hoạt động.", None
 

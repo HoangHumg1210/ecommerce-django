@@ -1,12 +1,11 @@
-from django.contrib.messages.api import success
-from django.shortcuts import render, redirect
-from django.shortcuts import get_object_or_404
+
+from django.shortcuts import render, redirect, get_object_or_404
 from orders.models import Order, OrderProduct
 from .forms import RegistrationForm, UserForm, UserProfileForm
 from .models import Account, UserProfile
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -18,6 +17,7 @@ from django.core.mail import EmailMessage
 from cart.models import Cart, CartItem  
 from cart.views import _cart_id  
 import requests
+from decimal import Decimal
 
 # Create your views here.
 
@@ -275,14 +275,32 @@ def change_password(request):
 
 @login_required(login_url='login')
 def order_detail(request, order_id):
-    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
-    order = Order.objects.get(order_number=order_id)
-    subtotal = 0
-    for i in order_detail:
-        subtotal += i.product_price * i.quantity
+    # đảm bảo đơn thuộc về user hiện tại
+    order = get_object_or_404(Order, order_number=order_id, user=request.user)
+
+    # đúng source dữ liệu cho bảng: OrderProduct (không phải CartItem)
+    ordered_products = (
+        OrderProduct.objects
+        .filter(order=order)
+        .select_related('product')
+        .prefetch_related('variations')
+    )
+
+    # subtotal = sum(price * qty)
+    subtotal = sum(Decimal(op.product_price) * op.quantity for op in ordered_products)
+
+    # discount = subtotal + tax - order_total  (không âm)
+    discount = (subtotal + Decimal(order.tax)) - Decimal(order.order_total)
+    if discount < 0:
+        discount = Decimal('0')
+
     context = {
-        'order_detail': order_detail,
         'order': order,
+        'ordered_products': ordered_products,              # <-- tên biến template đang dùng
         'subtotal': subtotal,
+        'discount': discount,
+        'voucher_codes': getattr(order, 'voucher_code', ''),  # nếu có field
+        'order_number': order.order_number,
+        'transID': order.payment.payment_id if order.payment else '',
     }
     return render(request, 'accounts/order_detail.html', context)

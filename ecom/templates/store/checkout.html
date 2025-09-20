@@ -111,30 +111,14 @@
               </div>
               <div class="d-flex justify-content-between">
                 <span>Thuế (2%):</span>
-                <strong>{{ tax|intcomma }}₫</strong>
-              </div>
-              {% if discount and discount > 0 %}
-              <div class="d-flex justify-content-between text-success">
-                <span>Giảm giá ({{ voucher_code }}):</span>
-                <strong>-{{ discount|intcomma }}₫</strong>
-              </div>
-              {% endif %}
-              <div class="d-flex justify-content-between mt-2">
-                <span class="h6 mb-0">Tổng thanh toán:</span>
-                <span class="h5 mb-0 text-primary">{{ payable|intcomma }}₫</span>
+                <strong>{{ tax|floatformat:"0"|intcomma }}₫</strong>
               </div>
 
-              <!-- FORM ÁP MÃ -->
-              <form method="post" action="{% url 'apply_voucher' %}" class="input-group mt-3">
-                  {% csrf_token %}
-                  <input type="text" name="voucher_code" class="form-control" placeholder="Mã giảm giá" value="{{ voucher_code|default:'' }}">
-                  <input type="hidden" name="subtotal" value="{{ total }}">  <!-- ĐÚNG: dùng subtotal -->
-                  <input type="hidden" name="next" value="{{ request.path }}"> <!-- quay lại checkout -->
-                  <button class="btn btn-outline-primary" type="submit">Áp dụng</button>
-                  {% if voucher_code %}
-                    <a class="btn btn-outline-secondary" href="{% url 'remove_voucher' %}?next={{ request.path }}">Hủy</a>
-                  {% endif %}
-                </form>
+              <div class="d-flex justify-content-between mt-2">
+                <span class="h6 mb-0">Tổng thanh toán:</span>
+                <span class="h5 mb-0 text-primary">{{ payable|floatformat:"0"|intcomma }}₫</span>
+              </div>
+
 
               <!-- NÚT ĐẶT HÀNG -->
               <button type="submit" name="submit" class="btn btn-primary btn-block mt-3">Đặt hàng</button>
