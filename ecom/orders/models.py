@@ -24,11 +24,17 @@ class Voucher(models.Model):
 
     def __str__(self): return self.code.upper()
 
+    class Meta:
+        db_table = 'orders_voucher'
+
 class VoucherRedemption(models.Model):
     voucher = models.ForeignKey(Voucher, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     order_number = models.CharField(max_length=50, blank=True, default="")
     used_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'orders_voucherredemption'
 
 class Payment(models.Model):  
     STATUS = (
@@ -49,6 +55,7 @@ class Payment(models.Model):
 
     def __str__(self):
         return self.payment_id
+
 
 
 class Order(models.Model):
