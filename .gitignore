@@ -1,0 +1,5 @@
+virt/
+.idea/
+.env
+staticfiles/
+

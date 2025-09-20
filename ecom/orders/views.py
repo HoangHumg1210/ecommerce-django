@@ -2,105 +2,117 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from cart.models import CartItem
 from .forms import OrderForm
-import datetime
 import re
 import json
 from django.http import JsonResponse
 from .models import OrderProduct, Product, Order, Payment
 from store.models import Product
-
-
-from django.http import JsonResponse
-import json
-
-from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from cart.models import CartItem
 from .forms import OrderForm
 import datetime
-import re
-import json
-from django.http import JsonResponse
-from .models import OrderProduct, Order, Payment
-from store.models import Product
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.http import JsonResponse
-import json
+import uuid
+from decimal import Decimal
 
+
+# ---------------------- PAYMENTS ----------------------
+from django.db import transaction
+
+@transaction.atomic
 def payments(request):
     if request.method != "POST":
         return JsonResponse({'status': 'fail', 'message': 'Invalid request.'}, status=400)
-
     try:
-        body = json.loads(request.body)
-
-        # DÙNG MÃ ĐƠN NỘI BỘ, KHÔNG DÙNG orderID CỦA PAYPAL
+        body = json.loads(request.body or "{}")
         order_no = body.get('local_order_number')
         order = Order.objects.get(user=request.user, is_ordered=False, order_number=order_no)
 
-        # payment_id: ưu tiên transactionID; nếu trống (COD) thì tạo UUID
-        tx_id = body.get('transactionID')
-        if not tx_id:
-            import uuid
-            tx_id = str(uuid.uuid4())
+        # 1) Lấy giảm giá từ session (đã set khi bấm "Áp dụng")
+        disc = Decimal(str(request.session.get('voucher_discount', 0)))  # vd 15000
+        if disc < 0:
+            disc = Decimal('0')
 
+        # 2) Tính payable dựa trên tổng cũ của order (đã gồm thuế)
+        #    Nếu muốn chặt chẽ hơn, có thể tự cộng lại từ CartItem.
+        payable = Decimal(order.order_total) - disc
+        if payable < 0:
+            payable = Decimal('0')
+
+        # 3) Tạo Payment
+        tx_id = body.get('transactionID') or str(uuid.uuid4())
+        payment_method = body.get('payment_method') or 'COD'
+        status = body.get('status') or ('COD' if payment_method == 'COD' else 'Completed')
         payment = Payment.objects.create(
             user=request.user,
             payment_id=tx_id,
-            payment_method=body.get('payment_method') or 'COD',
-            amount_paid=body.get('amount') or order.order_total,
-            status=body.get('status') or 'COD',
+            payment_method=payment_method,
+            amount_paid=payable,
+            status=status,
         )
 
-        # Chốt đơn
+        # 4) Cập nhật Order: ***Quan trọng: cập nhật order_total = payable***
         order.payment = payment
+        order.order_total = payable                # <-- tổng sau khi trừ voucher
+        if hasattr(order, "voucher_code"):
+            order.voucher_code = (
+                request.session.get('voucher_code', '') or
+                request.session.get('voucher_codes', '')
+            )
         order.is_ordered = True
         order.save()
 
-        # Chuyển CartItem -> OrderProduct
-        cart_items = CartItem.objects.filter(user=request.user)
+        # 5) Chuyển CartItem -> OrderProduct, trừ kho, xoá giỏ (nếu bạn chưa làm)
+        cart_items = CartItem.objects.filter(user=request.user).select_related('product').prefetch_related('variations')
         for item in cart_items:
             op = OrderProduct.objects.create(
-                order=order, payment=payment, user=request.user,
-                product=item.product, quantity=item.quantity,
-                product_price=item.product.price, ordered=True,
+                order=order,
+                payment=payment,
+                user=request.user,
+                product=item.product,
+                quantity=item.quantity,
+                product_price=item.product.price,  # giá tại thời điểm đặt
             )
-            op.variations.set(item.variations.all())
-            op.save()
-
-            # Trừ tồn
-            p = item.product
-            p.stock = max(0, p.stock - item.quantity)
-            p.save()
-
+            try:
+                op.variations.set(item.variations.all())
+            except Exception:
+                pass
+            if hasattr(item.product, 'stock'):
+                item.product.stock = max(0, item.product.stock - item.quantity)
+                item.product.save()
         cart_items.delete()
 
-        return JsonResponse({'order_number': order.order_number, 'payment_id': payment.payment_id})
+        # 6) Xoá session voucher sau khi chốt
+        for k in ("voucher_code", "voucher_codes", "voucher_discount"):
+            request.session.pop(k, None)
 
+        return JsonResponse({'order_number': order.order_number, 'payment_id': payment.payment_id})
     except Order.DoesNotExist:
-        return JsonResponse({'status': 'fail', 'message': 'Order not found (wrong local_order_number or already ordered).'}, status=404)
+        return JsonResponse({'status': 'fail', 'message': 'Order not found.'}, status=404)
     except Exception as e:
         return JsonResponse({'status': 'fail', 'message': str(e)}, status=500)
 
 
-
+# ---------------------- PLACE ORDER ----------------------
 def place_order(request, total=0, quantity=0):
     current_user = request.user
     cart_items = CartItem.objects.filter(user=current_user)
-    cart_count = cart_items.count()
-    if cart_count <= 0:
+    if not cart_items.exists():
         return redirect('store')
 
+    # Tính tổng
     for cart_item in cart_items:
         total += cart_item.product.price * cart_item.quantity
         quantity += cart_item.quantity
 
     usd_rate = 26389
     tax = total * 0.02
-    grand_total = total + tax
-    grand_total_usd = round(grand_total / usd_rate, 2)
+
+    # KHÔNG xoá session voucher ở đây để người dùng vẫn thấy giảm giá khi tới trang payments
+    discount = Decimal("0")
+    payable = Decimal(total) + Decimal(tax)
+    grand_total_usd = round(payable / usd_rate, 2)
 
     if request.method == 'POST':
         form = OrderForm(request.POST)
@@ -115,68 +127,58 @@ def place_order(request, total=0, quantity=0):
             data.state = form.cleaned_data['state']
             data.city = form.cleaned_data['city']
             data.order_note = form.cleaned_data['order_note']
-            data.order_total = grand_total
+            data.order_total = payable
             data.tax = tax
             data.ip = request.META.get('REMOTE_ADDR')
             data.save()
 
-            # Tạo order_number duy nhất
-            today = datetime.date.today()
-            current_date = today.strftime('%Y%m%d')
-            order_number = current_date + str(data.id)
+            # order_number duy nhất
+            today = datetime.date.today().strftime('%Y%m%d')
+            order_number = today + str(data.id)
             data.order_number = order_number
             data.save()
 
             order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
             context = {
-               'order': order,
-               'cart_items': cart_items,
-               'total': total,
-               'tax': tax,
-               'grand_total': grand_total,
-               'grand_total_usd': grand_total_usd,
+                'order': order,
+                'cart_items': cart_items,
+                'total': total,
+                'tax': tax,
+                'discount': discount,
+                'voucher_code': request.session.get("voucher_code") or request.session.get("voucher_codes"),
+                'grand_total': payable,
+                'grand_total_usd': grand_total_usd,
             }
             return render(request, 'orders/payments.html', context)
-        else:
 
-            return render('checkout')
-
+        return redirect('checkout')
 
 
-
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-
+# ---------------------- ORDER COMPLETE ----------------------
 def order_complete(request):
-    order_number = request.GET.get('order_number')
-    if not order_number:
+    on = request.GET.get('order_number')
+    if not on:
         return redirect('home')
 
-
-    order = get_object_or_404(Order, order_number=order_number, is_ordered=True)
-
-
+    order = get_object_or_404(Order, order_number=on, is_ordered=True)
     ordered_products = OrderProduct.objects.filter(order=order).select_related('product')
 
+    # subtotal = sum(price * qty)
+    subtotal = sum(Decimal(op.product_price) * op.quantity for op in ordered_products)
 
-    subtotal = sum(op.product_price * op.quantity for op in ordered_products)
-
-
-    payment = order.payment
-    if not payment:
-        return redirect('home')
+    # discount = subtotal + tax - order_total  (không âm)
+    discount = (subtotal + Decimal(order.tax)) - Decimal(order.order_total)
+    if discount < 0:
+        discount = Decimal('0')
 
     context = {
         'order': order,
         'ordered_products': ordered_products,
         'order_number': order.order_number,
-        'transID': payment.payment_id,
+        'transID': order.payment.payment_id if order.payment else '',
         'subtotal': subtotal,
+        'discount': discount,
+        # Nếu có lưu mã vào order.voucher_code thì hiển thị, còn không vẫn OK
+        'voucher_codes': getattr(order, 'voucher_code', ''),
     }
     return render(request, 'orders/order_complete.html', context)
-
-
-
-
-

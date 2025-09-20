@@ -2,16 +2,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.cart, name='cart'), # Trang xem giỏ hàng
-    path('add_cart/<int:product_id>/', views.add_cart, name='add_cart'), # Thêm sản phẩm vào giỏ hàng
-    path('remove_cart/<int:product_id>/', views.remove_cart, name='remove_cart'), # Giảm số lượng sản phẩm trong giỏ hàng
+    path('', views.cart, name='cart'),
+    path('add_cart/<int:product_id>/', views.add_cart, name='add_cart'),
+    path('remove_cart/<int:product_id>/', views.remove_cart, name='remove_cart'),
     path('remove_cart_item/<int:cart_item_id>/', views.remove_cart_item, name='remove_cart_item'),
-
     path('increase_cart_item/<int:cart_item_id>/', views.increase_cart_item, name='increase_cart_item'),
     path('decrease_cart_item/<int:cart_item_id>/', views.decrease_cart_item, name='decrease_cart_item'),
     path('checkout/', views.checkout, name='checkout'),
-    path("cart/apply-voucher/", views.apply_voucher, name="apply_voucher"),
-    path("cart/remove-voucher/", views.remove_voucher, name="remove_voucher"),
 
 
+    path('apply-voucher/', views.apply_voucher, name='apply_voucher'),
+    path('remove-voucher/', views.remove_voucher, name='remove_voucher'),
 ]
