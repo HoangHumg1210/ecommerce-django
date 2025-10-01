@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load currency %}
 {% load l10n %}
 
 {% block content %}
@@ -84,8 +85,8 @@
                   </td>
                   <td class="text-center">{{ cart_item.quantity }}</td>
                   <td class="text-right">
-                    <span class="font-weight-bold text-dark">{{ cart_item.sub_total|intcomma }}₫</span>
-                    <div class="text-muted small">{{ cart_item.product.price|intcomma }}₫/sản phẩm</div>
+                    <span class="font-weight-bold text-dark">{{ cart_item.sub_total|vnd }}₫</span>
+                    <div class="text-muted small">{{ cart_item.product.price|vnd }}₫/sản phẩm</div>
                   </td>
                 </tr>
                 {% empty %}
@@ -109,14 +110,14 @@
 
             <dl class="row mb-0">
               <dt class="col-6">Tạm tính:</dt>
-              <dd class="col-6 text-right">{{ total|floatformat:"0"|intcomma }}₫</dd>
+              <dd class="col-6 text-right">{{ total|floatformat:"0"|vnd }}₫</dd>
 
               {% if discount and discount > 0 %}
               <dt class="col-6">
                 Giảm giá <span id="voucher_codes_view">({{ voucher_code }})</span>:
               </dt>
               <dd class="col-6 text-right" id="discount_row">
-                <span id="voucher_discount_view">-{{ discount|floatformat:"0"|intcomma }}₫</span>
+                <span id="voucher_discount_view">-{{ discount|floatformat:"0"|vnd }}₫</span>
               </dd>
               {% else %}
               <dt class="col-6 d-none">
@@ -128,11 +129,11 @@
               {% endif %}
 
               <dt class="col-6">Thuế (2%):</dt>
-              <dd class="col-6 text-right">{{ tax|floatformat:"0"|intcomma }}₫</dd>
+              <dd class="col-6 text-right">{{ tax|floatformat:"0"|vnd }}₫</dd>
 
               <dt class="col-6 font-weight-bold h5 mt-2">Tổng thanh toán:</dt>
               <dd class="col-6 text-right font-weight-bold h5 mt-2 text-success">
-                {{ grand_total|floatformat:"0"|intcomma }}₫
+                {{ grand_total|floatformat:"0"|vnd }}₫
               </dd>
             </dl>
 

@@ -1,5 +1,8 @@
 {% extends 'base.html'%}
+{% load currency %}
 {% block content %}
+
+
 <section class="section-content padding-y bg">
   {% include 'includes/alerts.html'%}
   <div class="container">
@@ -35,7 +38,7 @@
                         </td>
                         <td>{{ order.full_name}}</td>
                         <td>{{ order.phone }}</td>
-                        <td>{{ order.order_total|floatformat:0 }}₫</td>
+                        <td>{{ order.order_total|vnd }}₫</td>
                         <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
                       </tr>
                     {% endfor %}

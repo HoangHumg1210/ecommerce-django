@@ -1,6 +1,7 @@
 {% extends 'base.html'%}
 {% load static%}
 {% load humanize %}
+{% load currency %}
 {% block content %}
 <section class="section-content padding-y bg">
   <div class="container">
@@ -62,8 +63,8 @@
                 </td>
                 <td>
                   <div class="price-wrap">
-                    <var class="price">{{ cart_item.sub_total|intcomma }}đ</var>
-                    <small class="text-muted d-block">{{ cart_item.product.price|intcomma }}đ / sản phẩm</small>
+                    <var class="price">{{ cart_item.sub_total|vnd }}đ</var>
+                    <small class="text-muted d-block">{{ cart_item.product.price|vnd }}đ / sản phẩm</small>
                   </div>
                 </td>
                 <td class="text-right">
@@ -87,16 +88,16 @@
           <div class="card-body">
             <dl class="dlist-align">
               <dt>Tổng giá:</dt>
-              <dd class="text-right">{{ total|floatformat:"0"|intcomma }}đ</dd>
+              <dd class="text-right">{{ total|floatformat:"0"|vnd }}đ</dd>
             </dl>
             <dl class="dlist-align">
               <dt>Thuế:</dt>
-              <dd class="text-right">{{ tax|floatformat:"0"|intcomma }}đ</dd>
+              <dd class="text-right">{{ tax|floatformat:"0"|vnd }}đ</dd>
             </dl>
             <dl class="dlist-align">
               <dt>Tổng thanh toán:</dt>
               <dd class="text-right text-dark b">
-                <strong>{{ grand_total|floatformat:"0"|intcomma }}đ</strong>
+                <strong>{{ grand_total|floatformat:"0"|vnd }}đ</strong>
               </dd>
             </dl>
 

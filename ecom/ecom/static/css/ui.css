@@ -861,7 +861,7 @@ a[class*=card]:hover .title {
 }
 .card-product-grid .img-wrap {
   border-radius: 0.2rem 0.2rem 0 0;
-  height: 220px;
+  height: 260px;
 }
 .card-product-grid .info-wrap {
   overflow: hidden;
@@ -887,7 +887,7 @@ a[class*=card]:hover .title {
   color: #3167eb;
 }
 .card-product-grid .fix-height {
-  height: 80px;
+  height: 90px;
   overflow: hidden;
 }
 .card-product-grid .btn-overlay {

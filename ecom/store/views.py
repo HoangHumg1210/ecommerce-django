@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
 
-from .forms import ReviewForm
-from .models import Product, ReviewRating, ProductGallery
+from .models import Product, ReviewRating, ProductGallery, Variation
 from category.models import Category
 from cart.models import CartItem
 from cart.views import _cart_id
@@ -15,31 +14,88 @@ from django.views.decorators.http import require_POST
 
 
 # Create your views here.
+# def store(request, category_slug=None):
+#     categories = None
+#     products = None
+#
+#     if category_slug!= None:
+#         categories = get_object_or_404(Category, slug=category_slug)
+#         products = Product.objects.filter(category=categories, is_available=True)
+#         paginator = Paginator(products, 6)
+#         page = request.GET.get('page')
+#         paged_products = paginator.get_page(page)
+#         product_count = products.count()
+#
+#     else:
+#         products = Product.objects.all().filter(is_available=True).order_by('id')
+#         paginator = Paginator(products, 3)
+#         page = request.GET.get('page')
+#         paged_products = paginator.get_page(page)
+#         product_count = products.count()
+#
+#     context = {
+#         'products': paged_products,
+#         'product_count': product_count,
+#         'categories': categories,
+#     }
+#     return render(request, 'store/store.html', context)
+
 def store(request, category_slug=None):
     categories = None
     products = None
-    
-    if category_slug!= None:
+
+    # Lấy filter size & price
+    selected_sizes = request.GET.getlist("size")
+    min_price = request.GET.get("min_price")
+    max_price = request.GET.get("max_price")
+
+    if category_slug:
         categories = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(category=categories, is_available=True)
-        paginator = Paginator(products, 6)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
-        product_count = products.count()
-        
     else:
-        products = Product.objects.all().filter(is_available=True).order_by('id')
-        paginator = Paginator(products, 3)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
-        product_count = products.count()
-        
+        products = Product.objects.filter(is_available=True).order_by('id')
+
+    # Áp dụng filter size
+    if selected_sizes:
+        products = products.filter(variation__variation_value__in=selected_sizes).distinct()
+
+    # Áp dụng filter giá
+    if min_price:
+        products = products.filter(price__gte=min_price)
+    if max_price:
+        products = products.filter(price__lte=max_price)
+
+    paginator = Paginator(products, 6)
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
+    product_count = products.count()
+
+    # Các option size & giá định nghĩa ở đây
+    size_options = ["S", "M", "L", "XL", "2XL"]
+    price_options = [
+        (0, "0 ₫"),
+        (50000, "50.000 ₫"),
+        (100000, "100.000 ₫"),
+        (150000, "150.000 ₫"),
+        (200000, "200.000 ₫"),
+        (500000, "500.000 ₫"),
+        (1000000, "1.000.000 ₫"),
+        (2000000, "2.000.000 ₫"),
+    ]
+
     context = {
         'products': paged_products,
         'product_count': product_count,
         'categories': categories,
+        'size_options': size_options,
+        'selected_sizes': selected_sizes,
+        'min_price': min_price,
+        'max_price': max_price,
+        'price_options': price_options,
     }
     return render(request, 'store/store.html', context)
+
+
 
 def product_detail(request, category_slug, product_slug):
     try:

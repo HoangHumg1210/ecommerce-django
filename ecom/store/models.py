@@ -17,6 +17,26 @@ class Product(models.Model):
     category         = models.ForeignKey(Category, on_delete=models.CASCADE) # nếu danh mục bị xóa thì sản phẩm cũng sẽ bị xóa
     created_date     = models.DateTimeField(auto_now_add=True)     # ngày tạo
     modified_date    = models.DateTimeField(auto_now=True) # ngày sửa đổi
+
+    material = models.CharField(max_length=200, blank=True, null=True)
+    form = models.CharField(max_length=200, blank=True, null=True)
+
+    def full_description(self):
+        desc = f"<h5>{self.product_name}</h5>"
+        if self.material:
+            desc += f"<p><b>Chất liệu:</b> {self.material}</p>"
+        if self.form:
+            desc += f"<p><b>Form:</b> {self.form}</p>"
+
+        if self.description:
+            parts = [p.strip() for p in self.description.split("\n") if p.strip()]
+            if parts:
+                desc += "<ul class='product-bullets'>"
+                for p in parts:
+                    desc += f"<li>{p}</li>"
+                desc += "</ul>"
+
+        return desc
     
     
     def get_url(self):

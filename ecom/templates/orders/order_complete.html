@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load currency %}
 {% block content %}
 
 <div class="container" style="margin-top:50px;">
@@ -79,18 +80,18 @@
                           </p>
                         </td>
                         <td class="text-center">{{ item.quantity }}</td>
-                        <td class="text-center">{{ item.product_price|floatformat:"0"|intcomma }}đ</td>
+                        <td class="text-center">{{ item.product_price|floatformat:"0"|vnd }}đ</td>
                       </tr>
                       {% endfor %}
                     </tbody>
                     <tfoot>
                       <tr>
                         <th colspan="2" class="text-right">Tạm tính:</th>
-                        <th class="text-center">{{ subtotal|floatformat:"0"|intcomma }}đ</th>
+                        <th class="text-center">{{ subtotal|floatformat:"0"|vnd }}đ</th>
                       </tr>
                       <tr>
                         <th colspan="2" class="text-right">Thuế (2%):</th>
-                        <th class="text-center">{{ order.tax|floatformat:"0"|intcomma }}đ</th>
+                        <th class="text-center">{{ order.tax|floatformat:"0"|vnd }}đ</th>
                       </tr>
                       <tr>
                         <th colspan="2" class="text-right">
@@ -98,7 +99,7 @@
                         </th>
                         <th class="text-center text-success">
                           {% if discount|floatformat:"0" != "0" and discount > 0 %}
-                            -{{ discount|floatformat:"0"|intcomma }}đ
+                            -{{ discount|floatformat:"0"|vnd }}đ
                           {% else %}
                             0đ
                           {% endif %}
@@ -106,7 +107,7 @@
                       </tr>
                       <tr>
                         <th colspan="2" class="text-right">Tổng cộng:</th>
-                        <th class="text-center">{{ order.order_total|floatformat:"0"|intcomma }}đ</th>
+                        <th class="text-center">{{ order.order_total|floatformat:"0"|vnd }}đ</th>
                       </tr>
                     </tfoot>
                   </table>

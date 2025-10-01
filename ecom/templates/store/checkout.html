@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize %} {# intcomma #}
+{% load humanize %}
+{% load currency %}
 
 {% block content %}
 <section class="section-content padding-y bg">
@@ -94,8 +95,8 @@
                     <td><label>{{ cart_item.quantity }}</label></td>
                     <td>
                       <div class="price-wrap">
-                        <var class="price">{{ cart_item.sub_total|intcomma }}₫</var>
-                        <small class="text-muted">{{ cart_item.product.price|intcomma }}₫/sản&nbsp;phẩm</small>
+                        <var class="price">{{ cart_item.sub_total|vnd }}₫</var>
+                        <small class="text-muted">{{ cart_item.product.price|vnd }}₫/sản&nbsp;phẩm</small>
                       </div>
                     </td>
                   </tr>
@@ -107,16 +108,16 @@
               <hr>
               <div class="d-flex justify-content-between">
                 <span>Tạm tính:</span>
-                <strong>{{ total|intcomma }}₫</strong>
+                <strong>{{ total|vnd }}₫</strong>
               </div>
               <div class="d-flex justify-content-between">
                 <span>Thuế (2%):</span>
-                <strong>{{ tax|floatformat:"0"|intcomma }}₫</strong>
+                <strong>{{ tax|floatformat:"0"|vnd }}₫</strong>
               </div>
 
               <div class="d-flex justify-content-between mt-2">
                 <span class="h6 mb-0">Tổng thanh toán:</span>
-                <span class="h5 mb-0 text-primary">{{ payable|floatformat:"0"|intcomma }}₫</span>
+                <span class="h5 mb-0 text-primary">{{ payable|floatformat:"0"|vnd }}₫</span>
               </div>
 
 
