@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="edb5c1b1-2e40-4381-a55b-d9e3fd872d34" name="Changes" comment="test">
+      <change beforePath="$PROJECT_DIR$/ecom/category/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/category/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/ecom/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/ecom/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/ecom/static/images/logo_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/store/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/store/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/store/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/store/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/home.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;HoangHumg1210&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HoangHumg1210/ecommerce-django.git&quot;,
+    &quot;accountId&quot;: &quot;f064ecaa-7dad-4fcb-9b54-cdc788ea6525&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/ecom/orders/views.py" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="32Py0XBcbCnJHQP5zOepPS37L1p" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Django Server.WEB_ECOMMERCE.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/Document/WEB_ECOMMERCE&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.general&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Document\WEB_ECOMMERCE\ecom\static\css" />
+      <recent name="E:\Document\WEB_ECOMMERCE\ecom\templates\accounts" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Document\WEB_ECOMMERCE\ecom\store\templatetags" />
+      <recent name="E:\Document\WEB_ECOMMERCE\ecom\store" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="WEB_ECOMMERCE" type="Python.DjangoServer" factoryName="Django server">
+      <module name="WEB_ECOMMERCE" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PY-251.25410.159" />
+        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="edb5c1b1-2e40-4381-a55b-d9e3fd872d34" name="Changes" comment="" />
+      <created>1757336280445</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1757336280445</updated>
+      <workItem from="1757336281916" duration="15374000" />
+      <workItem from="1757399809613" duration="26000" />
+      <workItem from="1757415004772" duration="6908000" />
+      <workItem from="1757429444549" duration="9699000" />
+      <workItem from="1757484238497" duration="22000" />
+      <workItem from="1757574615185" duration="6344000" />
+      <workItem from="1757651777700" duration="3802000" />
+      <workItem from="1757667441930" duration="3125000" />
+      <workItem from="1757829998375" duration="7185000" />
+      <workItem from="1757862099588" duration="1164000" />
+      <workItem from="1757863758613" duration="5432000" />
+      <workItem from="1758016710530" duration="2820000" />
+      <workItem from="1758086850779" duration="37000" />
+      <workItem from="1758104047404" duration="1513000" />
+      <workItem from="1758117469042" duration="513000" />
+      <workItem from="1758179482069" duration="4175000" />
+      <workItem from="1758214645204" duration="2973000" />
+      <workItem from="1758259101570" duration="1851000" />
+      <workItem from="1758273918111" duration="2155000" />
+      <workItem from="1758277436104" duration="648000" />
+      <workItem from="1758298242203" duration="5569000" />
+      <workItem from="1758339384906" duration="11737000" />
+      <workItem from="1758353935735" duration="60000" />
+      <workItem from="1758556972607" duration="147000" />
+      <workItem from="1759155787033" duration="6555000" />
+      <workItem from="1759278832363" duration="6642000" />
+      <workItem from="1759300193734" duration="16000" />
+      <workItem from="1759330472303" duration="72000" />
+      <workItem from="1759330600923" duration="428000" />
+      <workItem from="1759331057514" duration="10393000" />
+      <workItem from="1759374326504" duration="5298000" />
+      <workItem from="1759545351426" duration="103000" />
+      <workItem from="1761127582330" duration="131000" />
+    </task>
+    <task id="LOCAL-00001" summary="test">
+      <option name="closed" value="true" />
+      <created>1758299220523</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1758299220523</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="test" />
+    <option name="LAST_COMMIT_MESSAGE" value="test" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ecom/store/models.py</url>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ecom/cart/views.py</url>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ecom/cart/utils.py</url>
+          <line>1</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
