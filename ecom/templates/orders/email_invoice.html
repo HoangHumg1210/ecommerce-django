@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
+<html lang="vi">
+  <body style="font-family:Arial, Helvetica, sans-serif">
+    <h2>H2H Store – Hóa đơn #{{ order.order_number }}</h2>
+    <p>Xin chào {{ order.full_name|default:order.first_name }},</p>
+    <p>Cảm ơn bạn đã mua sắm tại H2H. Dưới đây là thông tin đơn hàng:</p>
+
+    <p><b>Mã đơn:</b> {{ order.order_number }}<br>
+       <b>Mã giao dịch:</b> {{ order.payment.payment_id }}<br>
+       <b>Trạng thái:</b> {{ order.payment.status }}</p>
+
+    <table width="100%" border="1" cellspacing="0" cellpadding="8" style="border-collapse:collapse">
+      <thead>
+        <tr>
+          <th align="left">Sản phẩm</th>
+          <th align="center">SL</th>
+          <th align="right">Giá</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for op in ordered_products %}
+        <tr>
+          <td>
+            {{ op.product.product_name }}
+            {% if op.variations.all %}
+              <div style="color:#555;font-size:12px">
+                {% for v in op.variations.all %}{{ v.variation_category }}: {{ v.variation_value }}{% if not forloop.last %}, {% endif %}{% endfor %}
+              </div>
+            {% endif %}
+          </td>
+          <td align="center">{{ op.quantity }}</td>
+          <td align="right">{{ op.product_price }}đ</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr><td colspan="2" align="right"><b>Tạm tính:</b></td><td align="right">{{ subtotal }}đ</td></tr>
+        <tr><td colspan="2" align="right"><b>Thuế:</b></td><td align="right">{{ order.tax }}đ</td></tr>
+        {% if discount and discount|floatformat != "0" %}
+        <tr><td colspan="2" align="right"><b>Giảm giá:</b></td><td align="right">-{{ discount }}đ</td></tr>
+        {% endif %}
+        <tr><td colspan="2" align="right"><b>Tổng cộng:</b></td><td align="right"><b>{{ order.order_total }}đ</b></td></tr>
+      </tfoot>
+    </table>
+
+    <p><b>Giao đến:</b><br>
+      {{ order.first_name }} {{ order.last_name }}<br>
+      {{ order.city }}, {{ order.state }}<br>
+      {{ order.address_line_1 }}
+    </p>
+
+    <p>— H2H Store</p>
+  </body>
 </html>

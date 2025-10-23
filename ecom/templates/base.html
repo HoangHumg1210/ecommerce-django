@@ -32,10 +32,27 @@
   <!-- PayPal -->
   <script src="https://www.paypal.com/sdk/js?client-id=AQLazLlsV9Dvvk559Ul7BlE4y8uoBa0qVf4BOaKuLCVV7DVVUoyj8i2UuZQot_UuHLfNDvSZ-8yiz-gv&currency=USD"></script>
 </head>
+{#<body>#}
+{#  {% include 'includes/navbar.html' %}#}
+{#  {% block content %}{% endblock %}#}
+{#  {% include 'includes/footer.html' %}#}
+{##}
+{#  <script src="{% static 'js/script_2.js' %}"></script>#}
+{#  <script>#}
+{#    $(function() {#}
+{#      setTimeout(function(){ $('.alert-autohide').fadeOut('slow'); }, 4000);#}
+{#    });#}
+{#  </script>#}
 <body>
-  {% include 'includes/navbar.html' %}
+  {% if request.resolver_match.url_name != 'login' %}
+    {% include 'includes/navbar.html' %}
+  {% endif %}
+
   {% block content %}{% endblock %}
-  {% include 'includes/footer.html' %}
+
+  {% if request.resolver_match.url_name != 'login' %}
+    {% include 'includes/footer.html' %}
+  {% endif %}
 
   <script src="{% static 'js/script_2.js' %}"></script>
   <script>
@@ -43,5 +60,6 @@
       setTimeout(function(){ $('.alert-autohide').fadeOut('slow'); }, 4000);
     });
   </script>
+
 </body>
 </html>

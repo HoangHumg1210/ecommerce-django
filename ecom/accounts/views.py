@@ -79,30 +79,29 @@ def login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-
         user = auth.authenticate(email=email, password=password)
-        
+
         if user is not None:
             try:
                 cart = Cart.objects.get(cart_id=_cart_id(request))
                 is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
-                
-                if is_cart_item_exists: 
+
+                if is_cart_item_exists:
                     cart_item = CartItem.objects.filter(cart=cart)
-                    
+
                     for item in cart_item:
                         item.user = user
                         item.save()
             except:
                 pass
-            
-            
+
+
             auth.login(request, user)
             messages.success(request, 'Đăng nhập thành công!' )
             url = request.META.get('HTTP_REFERER')
             try:
                 query = requests.utils.urlparse(url).query
-               
+
                 params = dict(x.split('=') for x in query.split('&'))
                 if 'next' in params:
                     nextPage = params['next']
@@ -110,8 +109,8 @@ def login(request):
 
             except:
                 return redirect('dashboard')
-                
-            
+
+
         else:
             messages.error(request, "Tài khoản hoặc mật khẩu không chính xác")
             return redirect('login')

@@ -7,10 +7,14 @@
 <section class="section-pagetop bg">
   <div class="container">
     {% if 'search' in request.path %}
-      <h2 class="title-page">Kết quả tìm kiếm</h2>
-    {% else %}
-      <h2 class="title-page">Cửa hàng</h2>
-    {% endif %}
+  <h2 class="title-page">Kết quả tìm kiếm</h2>
+{% else %}
+  <h2 class="title-page">
+    <a href="{% url 'home' %}" style="text-decoration:none; color:inherit;">
+      Trang chủ
+    </a>
+  </h2>
+{% endif %}
   </div>
 </section>
 

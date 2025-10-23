@@ -29,7 +29,7 @@ def payments(request):
         order_no = body.get('local_order_number')
         order = Order.objects.get(user=request.user, is_ordered=False, order_number=order_no)
 
-        # 1) Lấy giảm giá từ session (đã set khi bấm "Áp dụng")
+
         disc = Decimal(str(request.session.get('voucher_discount', 0)))  # vd 15000
         if disc < 0:
             disc = Decimal('0')
@@ -52,9 +52,8 @@ def payments(request):
             status=status,
         )
 
-        # 4) Cập nhật Order: ***Quan trọng: cập nhật order_total = payable***
         order.payment = payment
-        order.order_total = payable                # <-- tổng sau khi trừ voucher
+        order.order_total = payable
         if hasattr(order, "voucher_code"):
             order.voucher_code = (
                 request.session.get('voucher_code', '') or
@@ -63,7 +62,7 @@ def payments(request):
         order.is_ordered = True
         order.save()
 
-        # 5) Chuyển CartItem -> OrderProduct, trừ kho, xoá giỏ (nếu bạn chưa làm)
+
         cart_items = CartItem.objects.filter(user=request.user).select_related('product').prefetch_related('variations')
         for item in cart_items:
             op = OrderProduct.objects.create(
@@ -83,9 +82,35 @@ def payments(request):
                 item.product.save()
         cart_items.delete()
 
-        # 6) Xoá session voucher sau khi chốt
+
         for k in ("voucher_code", "voucher_codes", "voucher_discount"):
             request.session.pop(k, None)
+
+        try:
+            ordered_products = OrderProduct.objects.filter(
+                order=order
+            ).select_related('product').prefetch_related('variations')
+
+            # Tính lại subtotal & discount giống order_complete
+            subtotal = sum(Decimal(op.product_price) * op.quantity for op in ordered_products)
+            discount = (subtotal + Decimal(order.tax)) - Decimal(order.order_total)
+            if discount < 0:
+                discount = Decimal('0')
+
+            mail_subject = f"H2H Store – Hóa đơn #{order.order_number}"
+            html_message = render_to_string('orders/email_invoice.html', {
+                'order': order,
+                'ordered_products': ordered_products,
+                'subtotal': subtotal,
+                'discount': discount,
+            })
+            to_email = request.user.email
+            email = EmailMessage(mail_subject, html_message, to=[to_email])
+            email.content_subtype = "html"  # gửi HTML
+            email.send(fail_silently=True)
+        except Exception:
+            # Không chặn thanh toán nếu gửi mail lỗi
+            pass
 
         return JsonResponse({'order_number': order.order_number, 'payment_id': payment.payment_id})
     except Order.DoesNotExist:

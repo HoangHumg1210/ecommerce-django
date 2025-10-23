@@ -5,12 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="edb5c1b1-2e40-4381-a55b-d9e3fd872d34" name="Changes" comment="test">
-      <change beforePath="$PROJECT_DIR$/ecom/category/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/category/admin.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ecom/templates/orders/email_invoice.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/accounts/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/accounts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/cart/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/cart/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/cart/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/cart/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ecom/ecom/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/ecom/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ecom/ecom/static/images/logo_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ecom/store/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/store/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/orders/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/orders/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ecom/store/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/store/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ecom/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/accounts/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/accounts/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/accounts/order_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/accounts/order_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/includes/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/includes/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/orders/order_complete.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/orders/order_complete.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/store/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/store/product_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ecom/templates/store/store.html" beforeDir="false" afterPath="$PROJECT_DIR$/ecom/templates/store/store.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,8 +33,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -161,6 +171,7 @@
       <workItem from="1759374326504" duration="5298000" />
       <workItem from="1759545351426" duration="103000" />
       <workItem from="1761127582330" duration="131000" />
+      <workItem from="1761182355411" duration="7504000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <option name="closed" value="true" />
